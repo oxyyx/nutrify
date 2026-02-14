@@ -1,0 +1,37 @@
+import type { DailyMacroDto } from "@/shared/lib/types";
+
+interface WeeklyChartProps {
+  days: DailyMacroDto[];
+}
+
+export function WeeklyChart({ days }: WeeklyChartProps) {
+  const maxCalories = Math.max(...days.map((d) => d.summary.totalCalories), 1);
+
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-6">
+      <h2 className="mb-4 text-lg font-semibold text-gray-900">Weekly Overview</h2>
+      <div className="flex items-end gap-2" style={{ height: "200px" }}>
+        {days.map((day) => {
+          const height = (day.summary.totalCalories / maxCalories) * 100;
+          const date = new Date(day.date);
+          const dayLabel = date.toLocaleDateString(undefined, { weekday: "short" });
+
+          return (
+            <div key={day.date} className="flex flex-1 flex-col items-center gap-1">
+              <span className="text-xs text-gray-500">
+                {Math.round(day.summary.totalCalories)}
+              </span>
+              <div className="w-full flex-1 flex items-end">
+                <div
+                  className="w-full rounded-t bg-primary"
+                  style={{ height: `${Math.max(height, 2)}%` }}
+                />
+              </div>
+              <span className="text-xs font-medium text-gray-600">{dayLabel}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

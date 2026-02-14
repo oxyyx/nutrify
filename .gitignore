@@ -1,0 +1,121 @@
+## .NET
+[Bb]in/
+[Oo]bj/
+artifacts/
+project.lock.json
+project.fragment.lock.json
+*.lock.json
+*.nupkg
+*.snupkg
+/packages/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# .NET tools
+*.DotSettings.user
+BenchmarkDotNet.Artifacts/
+
+# NuGet
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nupkg
+**/packages/repositories.config
+
+# ASP.NET
+ScaffoldingReadMe.txt
+**/Properties/launchSettings.json
+**/appsettings.*.json
+!**/appsettings.Development.json
+
+# Entity Framework migrations snapshot (keep, but ignore local DB files)
+*.mdf
+*.ldf
+*.ndf
+
+# Visual Studio
+.vs/
+*.sln.iml
+*.csproj.user
+*.dbmdl
+*.jfm
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# JetBrains Rider
+.idea/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## Node.js / React Client
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Testing
+coverage/
+*.lcov
+test-results/
+TestResults/
+
+## Aspire
+.dcproj.user
+
+## Docker / Keycloak
+docker-compose.override.yml
+
+## OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+ehthumbs_vista.db
+$RECYCLE.BIN/
+
+## Misc
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.temp
+*.log
+
+# Claude
+.claude/

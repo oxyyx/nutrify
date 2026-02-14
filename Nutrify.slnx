@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Nutrify.Api/Nutrify.Api.csproj" />
+    <Project Path="src/Nutrify.AppHost/Nutrify.AppHost.csproj" />
+    <Project Path="src/Nutrify.Contracts/Nutrify.Contracts.csproj" />
+    <Project Path="src/Nutrify.ServiceDefaults/Nutrify.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Nutrify.Api.Tests/Nutrify.Api.Tests.csproj" />
+  </Folder>
+</Solution>

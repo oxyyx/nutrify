@@ -15,8 +15,8 @@ const macroItems = [
 
 export function TodaySummaryCard({ summary }: TodaySummaryCardProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">Today's Summary</h2>
+    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Today's Summary</h2>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         {macroItems.map((item) => (
           <div key={item.key} className="text-center">

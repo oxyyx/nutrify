@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { CreateFoodItemRequest, FoodItemDto } from "@/shared/lib/types";
 import { FoodItemType } from "@/shared/lib/types";
-import { useCategories } from "@/features/categories/hooks/useCategories";
+import { CategorySelect } from "./CategorySelect";
 
 interface FoodItemFormProps {
   initialData?: FoodItemDto;
@@ -19,8 +19,6 @@ export function FoodItemForm({ initialData, onSubmit, onCancel, isSubmitting }: 
   const [fatG, setFatG] = useState(String(initialData?.fatG ?? ""));
   const [fiberG, setFiberG] = useState(String(initialData?.fiberG ?? ""));
   const [categoryId, setCategoryId] = useState<number | null>(initialData?.categoryId ?? null);
-
-  const { data: categories } = useCategories();
 
   const unit = type === FoodItemType.Drink ? "mL" : "g";
 
@@ -70,16 +68,7 @@ export function FoodItemForm({ initialData, onSubmit, onCancel, isSubmitting }: 
 
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">Category</label>
-        <select
-          value={categoryId ?? ""}
-          onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : null)}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-        >
-          <option value="">No category</option>
-          {categories?.map((cat) => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
-          ))}
-        </select>
+        <CategorySelect value={categoryId} onChange={setCategoryId} />
       </div>
 
       <p className="text-sm font-medium text-gray-700">

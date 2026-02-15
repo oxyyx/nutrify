@@ -10,7 +10,7 @@ interface FoodItemListProps {
 
 export function FoodItemList({ items, onDelete }: FoodItemListProps) {
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-card">
       <table className="w-full text-left text-sm">
         <thead className="border-b border-gray-200 bg-gray-50">
           <tr>

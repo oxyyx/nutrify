@@ -8,16 +8,16 @@ interface IntakeTimelineProps {
 export function IntakeTimeline({ entries }: IntakeTimelineProps) {
   if (entries.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">Today's Intake</h2>
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Today's Intake</h2>
         <p className="text-sm text-gray-500">No entries yet. Start logging your meals!</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">Today's Intake</h2>
+    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Today's Intake</h2>
       <div className="space-y-3">
         {entries.map((entry) => (
           <div

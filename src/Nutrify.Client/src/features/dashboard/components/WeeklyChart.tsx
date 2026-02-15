@@ -8,8 +8,8 @@ export function WeeklyChart({ days }: WeeklyChartProps) {
   const maxCalories = Math.max(...days.map((d) => d.summary.totalCalories), 1);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">Weekly Overview</h2>
+    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Weekly Overview</h2>
       <div className="flex items-end gap-2" style={{ height: "200px" }}>
         {days.map((day) => {
           const height = (day.summary.totalCalories / maxCalories) * 100;
@@ -23,7 +23,7 @@ export function WeeklyChart({ days }: WeeklyChartProps) {
               </span>
               <div className="w-full flex-1 flex items-end">
                 <div
-                  className="w-full rounded-t bg-primary"
+                  className="w-full rounded-t bg-primary/80"
                   style={{ height: `${Math.max(height, 2)}%` }}
                 />
               </div>

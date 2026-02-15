@@ -15,8 +15,8 @@ export function MacroBreakdown({ summary }: MacroBreakdownProps) {
   ];
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">Macro Breakdown</h2>
+    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Macro Breakdown</h2>
       {total === 0 ? (
         <p className="text-sm text-gray-500">No intake recorded yet today.</p>
       ) : (

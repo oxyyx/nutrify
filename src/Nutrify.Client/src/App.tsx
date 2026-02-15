@@ -9,7 +9,7 @@ export function App() {
     <OidcProvider
       fallback={
         <div className="flex h-screen items-center justify-center">
-          <div className="text-lg text-gray-500">Loading authentication...</div>
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-200 border-t-primary" />
         </div>
       }
     >

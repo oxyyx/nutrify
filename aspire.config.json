@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "src/Nutrify.AppHost/Nutrify.AppHost.csproj"
+  }
+}

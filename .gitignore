@@ -43,7 +43,6 @@ BenchmarkDotNet.Artifacts/
 
 # ASP.NET
 ScaffoldingReadMe.txt
-**/Properties/launchSettings.json
 **/appsettings.*.json
 !**/appsettings.Development.json
 

@@ -4,11 +4,14 @@ import { useCategories } from "@/features/categories/hooks/useCategories";
 import { useCreateCategory } from "@/features/categories/hooks/useCreateCategory";
 import { CategoryList } from "@/features/categories/components/CategoryList";
 import { EmptyState } from "@/shared/components/EmptyState";
+import { ErrorState } from "@/shared/components/ErrorState";
+import { ErrorBanner } from "@/shared/components/ErrorBanner";
 import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
+import { getErrorMessage } from "@/shared/lib/utils";
 
 function CategoriesPage() {
   const [newName, setNewName] = useState("");
-  const { data: categories, isLoading } = useCategories();
+  const { data: categories, isLoading, isError, error, refetch } = useCategories();
   const createMutation = useCreateCategory();
 
   function handleCreate(e: React.FormEvent) {
@@ -41,8 +44,18 @@ function CategoriesPage() {
         </button>
       </form>
 
+      {createMutation.isError && (
+        <ErrorBanner message={getErrorMessage(createMutation.error)} />
+      )}
+
       {isLoading ? (
         <LoadingSpinner className="py-12" />
+      ) : isError ? (
+        <ErrorState
+          title="Couldn't load categories"
+          message={getErrorMessage(error)}
+          onRetry={() => refetch()}
+        />
       ) : categories && categories.length > 0 ? (
         <CategoryList categories={categories} />
       ) : (

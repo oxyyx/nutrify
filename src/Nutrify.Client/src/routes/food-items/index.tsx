@@ -6,9 +6,11 @@ import { useCategories } from "@/features/categories/hooks/useCategories";
 import { FoodItemList } from "@/features/food-items/components/FoodItemList";
 import { Pagination } from "@/shared/components/Pagination";
 import { EmptyState } from "@/shared/components/EmptyState";
+import { ErrorState } from "@/shared/components/ErrorState";
 import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { useDebounce } from "@/shared/hooks/useDebounce";
+import { getErrorMessage } from "@/shared/lib/utils";
 import type { FoodItemType } from "@/shared/lib/types";
 
 function FoodItemsPage() {
@@ -19,9 +21,19 @@ function FoodItemsPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const debouncedSearch = useDebounce(search);
-  const { data, isLoading } = useFoodItems({ page, search: debouncedSearch, categoryId, type });
+  const { data, isLoading, isError, error, refetch } = useFoodItems({ page, search: debouncedSearch, categoryId, type });
   const { data: categories } = useCategories();
   const deleteMutation = useDeleteFoodItem();
+
+  function openDelete(id: number) {
+    deleteMutation.reset();
+    setDeleteId(id);
+  }
+
+  function cancelDelete() {
+    deleteMutation.reset();
+    setDeleteId(null);
+  }
 
   function confirmDelete() {
     if (deleteId !== null) {
@@ -74,9 +86,15 @@ function FoodItemsPage() {
 
       {isLoading ? (
         <LoadingSpinner className="py-12" />
+      ) : isError ? (
+        <ErrorState
+          title="Couldn't load food items"
+          message={getErrorMessage(error)}
+          onRetry={() => refetch()}
+        />
       ) : data && data.items.length > 0 ? (
         <>
-          <FoodItemList items={data.items} onDelete={setDeleteId} />
+          <FoodItemList items={data.items} onDelete={openDelete} />
           <Pagination page={data.page} totalPages={data.totalPages} onPageChange={setPage} />
         </>
       ) : (
@@ -90,8 +108,10 @@ function FoodItemsPage() {
         isOpen={deleteId !== null}
         title="Delete Food Item"
         message="Are you sure you want to delete this food item? This action cannot be undone."
+        error={deleteMutation.isError ? getErrorMessage(deleteMutation.error) : null}
+        isConfirming={deleteMutation.isPending}
         onConfirm={confirmDelete}
-        onCancel={() => setDeleteId(null)}
+        onCancel={cancelDelete}
       />
     </div>
   );

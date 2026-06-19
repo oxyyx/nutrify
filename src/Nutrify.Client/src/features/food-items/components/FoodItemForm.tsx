@@ -2,15 +2,17 @@ import { useState } from "react";
 import type { CreateFoodItemRequest, FoodItemDto } from "@/shared/lib/types";
 import { FoodItemType } from "@/shared/lib/types";
 import { CategorySelect } from "./CategorySelect";
+import { ErrorBanner } from "@/shared/components/ErrorBanner";
 
 interface FoodItemFormProps {
   initialData?: FoodItemDto;
   onSubmit: (data: CreateFoodItemRequest) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
+  error?: string | null;
 }
 
-export function FoodItemForm({ initialData, onSubmit, onCancel, isSubmitting }: FoodItemFormProps) {
+export function FoodItemForm({ initialData, onSubmit, onCancel, isSubmitting, error }: FoodItemFormProps) {
   const [name, setName] = useState(initialData?.name ?? "");
   const [type, setType] = useState<FoodItemType>(initialData?.type ?? FoodItemType.Food);
   const [caloriesKcal, setCaloriesKcal] = useState(String(initialData?.caloriesKcal ?? ""));
@@ -97,6 +99,8 @@ export function FoodItemForm({ initialData, onSubmit, onCancel, isSubmitting }: 
           </div>
         ))}
       </div>
+
+      {error && <ErrorBanner message={error} />}
 
       <div className="flex justify-end gap-3 pt-2">
         <button

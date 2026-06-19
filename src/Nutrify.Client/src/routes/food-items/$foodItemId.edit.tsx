@@ -3,15 +3,27 @@ import { FoodItemForm } from "@/features/food-items/components/FoodItemForm";
 import { useFoodItem } from "@/features/food-items/hooks/useFoodItem";
 import { useUpdateFoodItem } from "@/features/food-items/hooks/useUpdateFoodItem";
 import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
+import { ErrorState } from "@/shared/components/ErrorState";
+import { getErrorMessage } from "@/shared/lib/utils";
 
 function EditFoodItemPage() {
   const { foodItemId } = Route.useParams();
   const navigate = useNavigate();
-  const { data: foodItem, isLoading } = useFoodItem(Number(foodItemId));
+  const { data: foodItem, isLoading, isError, error, refetch } = useFoodItem(Number(foodItemId));
   const mutation = useUpdateFoodItem();
 
   if (isLoading) {
     return <LoadingSpinner className="py-12" />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        title="Couldn't load food item"
+        message={getErrorMessage(error)}
+        onRetry={() => refetch()}
+      />
+    );
   }
 
   if (!foodItem) {
@@ -34,6 +46,7 @@ function EditFoodItemPage() {
           }
           onCancel={() => navigate({ to: "/food-items" })}
           isSubmitting={mutation.isPending}
+          error={mutation.isError ? getErrorMessage(mutation.error) : null}
         />
       </div>
     </div>

@@ -3,6 +3,8 @@ import type { CategoryDto } from "@/shared/lib/types";
 import { useUpdateCategory } from "../hooks/useUpdateCategory";
 import { useDeleteCategory } from "../hooks/useDeleteCategory";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { ErrorBanner } from "@/shared/components/ErrorBanner";
+import { getErrorMessage } from "@/shared/lib/utils";
 
 interface CategoryListProps {
   categories: CategoryDto[];
@@ -17,11 +19,13 @@ export function CategoryList({ categories }: CategoryListProps) {
   const deleteMutation = useDeleteCategory();
 
   function startEdit(category: CategoryDto) {
+    updateMutation.reset();
     setEditingId(category.id);
     setEditName(category.name);
   }
 
   function cancelEdit() {
+    updateMutation.reset();
     setEditingId(null);
     setEditName("");
   }
@@ -31,6 +35,16 @@ export function CategoryList({ categories }: CategoryListProps) {
       { id, data: { name: editName } },
       { onSuccess: () => cancelEdit() },
     );
+  }
+
+  function openDelete(id: number) {
+    deleteMutation.reset();
+    setDeleteId(id);
+  }
+
+  function cancelDelete() {
+    deleteMutation.reset();
+    setDeleteId(null);
   }
 
   function confirmDelete() {
@@ -50,30 +64,36 @@ export function CategoryList({ categories }: CategoryListProps) {
             className="flex items-center justify-between rounded-md border border-gray-200 bg-white p-3"
           >
             {editingId === category.id ? (
-              <div className="flex flex-1 items-center gap-2">
-                <input
-                  type="text"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") saveEdit(category.id);
-                    if (e.key === "Escape") cancelEdit();
-                  }}
-                />
-                <button
-                  onClick={() => saveEdit(category.id)}
-                  className="rounded bg-primary px-3 py-1.5 text-sm text-white hover:bg-primary-dark"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={cancelEdit}
-                  className="rounded bg-gray-100 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200"
-                >
-                  Cancel
-                </button>
+              <div className="flex flex-1 flex-col gap-2">
+                <div className="flex flex-1 items-center gap-2">
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveEdit(category.id);
+                      if (e.key === "Escape") cancelEdit();
+                    }}
+                  />
+                  <button
+                    onClick={() => saveEdit(category.id)}
+                    disabled={!editName.trim() || updateMutation.isPending}
+                    className="rounded bg-primary px-3 py-1.5 text-sm text-white hover:bg-primary-dark disabled:opacity-50"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    className="rounded bg-gray-100 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                {updateMutation.isError && (
+                  <ErrorBanner message={getErrorMessage(updateMutation.error)} />
+                )}
               </div>
             ) : (
               <>
@@ -91,7 +111,7 @@ export function CategoryList({ categories }: CategoryListProps) {
                     Edit
                   </button>
                   <button
-                    onClick={() => setDeleteId(category.id)}
+                    onClick={() => openDelete(category.id)}
                     className="text-sm text-red-600 hover:text-red-800"
                   >
                     Delete
@@ -107,8 +127,10 @@ export function CategoryList({ categories }: CategoryListProps) {
         isOpen={deleteId !== null}
         title="Delete Category"
         message="Are you sure you want to delete this category? This action cannot be undone."
+        error={deleteMutation.isError ? getErrorMessage(deleteMutation.error) : null}
+        isConfirming={deleteMutation.isPending}
         onConfirm={confirmDelete}
-        onCancel={() => setDeleteId(null)}
+        onCancel={cancelDelete}
       />
     </>
   );

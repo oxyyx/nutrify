@@ -2,14 +2,16 @@ import { useState } from "react";
 import type { CreateIntakeEntryRequest, FoodItemDto } from "@/shared/lib/types";
 import { FoodSearchSelect } from "./FoodSearchSelect";
 import { calculateMacros, formatCalories, formatMacro } from "@/shared/lib/utils";
+import { ErrorBanner } from "@/shared/components/ErrorBanner";
 
 interface IntakeEntryFormProps {
   onSubmit: (data: CreateIntakeEntryRequest) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
+  error?: string | null;
 }
 
-export function IntakeEntryForm({ onSubmit, onCancel, isSubmitting }: IntakeEntryFormProps) {
+export function IntakeEntryForm({ onSubmit, onCancel, isSubmitting, error }: IntakeEntryFormProps) {
   const [selectedFood, setSelectedFood] = useState<FoodItemDto | null>(null);
   const [amount, setAmount] = useState("");
 
@@ -63,6 +65,8 @@ export function IntakeEntryForm({ onSubmit, onCancel, isSubmitting }: IntakeEntr
           </p>
         </div>
       )}
+
+      {error && <ErrorBanner message={error} />}
 
       <div className="flex justify-end gap-3 pt-2">
         <button

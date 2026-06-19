@@ -3,11 +3,14 @@ import { useIntakeEntries } from "@/features/intake/hooks/useIntakeEntries";
 import { useDeleteIntakeEntry } from "@/features/intake/hooks/useDeleteIntakeEntry";
 import { IntakeEntryList } from "@/features/intake/components/IntakeEntryList";
 import { EmptyState } from "@/shared/components/EmptyState";
+import { ErrorState } from "@/shared/components/ErrorState";
+import { ErrorBanner } from "@/shared/components/ErrorBanner";
 import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
+import { getErrorMessage, getLocalDateString } from "@/shared/lib/utils";
 
 function IntakePage() {
-  const today = new Date().toISOString().split("T")[0]!;
-  const { data, isLoading } = useIntakeEntries({ date: today });
+  const today = getLocalDateString();
+  const { data, isLoading, isError, error, refetch } = useIntakeEntries({ date: today });
   const deleteMutation = useDeleteIntakeEntry();
 
   return (
@@ -22,8 +25,18 @@ function IntakePage() {
         </Link>
       </div>
 
+      {deleteMutation.isError && (
+        <ErrorBanner message={getErrorMessage(deleteMutation.error)} />
+      )}
+
       {isLoading ? (
         <LoadingSpinner className="py-12" />
+      ) : isError ? (
+        <ErrorState
+          title="Couldn't load today's intake"
+          message={getErrorMessage(error)}
+          onRetry={() => refetch()}
+        />
       ) : data && data.items.length > 0 ? (
         <IntakeEntryList
           entries={data.items}

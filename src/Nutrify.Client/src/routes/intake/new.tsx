@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { IntakeEntryForm } from "@/features/intake/components/IntakeEntryForm";
 import { useCreateIntakeEntry } from "@/features/intake/hooks/useCreateIntakeEntry";
+import { getErrorMessage } from "@/shared/lib/utils";
 
 function NewIntakePage() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ function NewIntakePage() {
           }
           onCancel={() => navigate({ to: "/intake" })}
           isSubmitting={mutation.isPending}
+          error={mutation.isError ? getErrorMessage(mutation.error) : null}
         />
       </div>
     </div>

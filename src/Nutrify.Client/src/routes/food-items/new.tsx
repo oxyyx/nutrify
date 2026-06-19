@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { FoodItemForm } from "@/features/food-items/components/FoodItemForm";
 import { useCreateFoodItem } from "@/features/food-items/hooks/useCreateFoodItem";
+import { getErrorMessage } from "@/shared/lib/utils";
 
 function NewFoodItemPage() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ function NewFoodItemPage() {
           }
           onCancel={() => navigate({ to: "/food-items" })}
           isSubmitting={mutation.isPending}
+          error={mutation.isError ? getErrorMessage(mutation.error) : null}
         />
       </div>
     </div>

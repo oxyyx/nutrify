@@ -6,13 +6,30 @@ import { MacroBreakdown } from "@/features/dashboard/components/MacroBreakdown";
 import { WeeklyChart } from "@/features/dashboard/components/WeeklyChart";
 import { IntakeTimeline } from "@/features/dashboard/components/IntakeTimeline";
 import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
+import { ErrorState } from "@/shared/components/ErrorState";
+import { getErrorMessage } from "@/shared/lib/utils";
 
 function DashboardPage() {
-  const { data: today, isLoading: isTodayLoading } = useTodayDashboard();
-  const { data: weekly, isLoading: isWeeklyLoading } = useWeeklyOverview();
+  const todayQuery = useTodayDashboard();
+  const weeklyQuery = useWeeklyOverview();
+  const { data: today } = todayQuery;
+  const { data: weekly } = weeklyQuery;
 
-  if (isTodayLoading || isWeeklyLoading) {
+  if (todayQuery.isLoading || weeklyQuery.isLoading) {
     return <LoadingSpinner className="py-12" />;
+  }
+
+  if (todayQuery.isError || weeklyQuery.isError) {
+    return (
+      <ErrorState
+        title="Couldn't load your dashboard"
+        message={getErrorMessage(todayQuery.error ?? weeklyQuery.error)}
+        onRetry={() => {
+          todayQuery.refetch();
+          weeklyQuery.refetch();
+        }}
+      />
+    );
   }
 
   return (

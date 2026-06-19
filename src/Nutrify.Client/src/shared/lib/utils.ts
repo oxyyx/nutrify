@@ -42,3 +42,17 @@ export function formatTime(dateString: string): string {
     minute: "2-digit",
   });
 }
+
+/** Local calendar date as YYYY-MM-DD (en-CA yields ISO-style output in local time). */
+export function getLocalDateString(date = new Date()): string {
+  return date.toLocaleDateString("en-CA");
+}
+
+/** Extracts a user-facing message from a thrown value (ApiError carries a real message). */
+export function getErrorMessage(
+  error: unknown,
+  fallback = "Something went wrong. Please try again.",
+): string {
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}

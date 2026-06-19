@@ -9,11 +9,14 @@ export const {
   clientId: import.meta.env.VITE_OIDC_CLIENT_ID || "nutrify-spa",
   publicUrl: import.meta.env.BASE_URL,
   decodedIdTokenSchema: {
-    parse: (token: Record<string, unknown>) => ({
-      sub: token["sub"] as string,
-      preferred_username: token["preferred_username"] as string,
-      name: (token["name"] as string) || (token["preferred_username"] as string),
-      email: token["email"] as string,
-    }),
+    parse: (data: unknown) => {
+      const token = data as Record<string, unknown>;
+      return {
+        sub: token["sub"] as string,
+        preferred_username: token["preferred_username"] as string,
+        name: (token["name"] as string) || (token["preferred_username"] as string),
+        email: token["email"] as string,
+      };
+    },
   },
 });

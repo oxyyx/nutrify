@@ -5,6 +5,8 @@ import { useOidc } from "@/oidc";
 function LoginPage() {
   const oidc = useOidc();
 
+  if (oidc.isUserLoggedIn) return null;
+
   return (
     <div className="flex h-screen flex-col items-center justify-center bg-gray-50">
       <div className="w-full max-w-sm px-4">
@@ -38,7 +40,7 @@ function LoginPage() {
         {/* Sign-in card */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <button
-            onClick={() => oidc.login()}
+            onClick={() => oidc.login({ doesCurrentHrefRequiresAuth: false })}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             Continue with sign in

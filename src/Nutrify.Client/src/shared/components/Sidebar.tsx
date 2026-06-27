@@ -70,15 +70,14 @@ const navItems = [
 // --- User section ---
 
 function UserSection({
-  tokens,
+  decodedIdToken,
   onLogout,
   collapsed,
 }: {
-  tokens: { decodedIdToken: { name: string; email: string } };
+  decodedIdToken: { name: string; email: string };
   onLogout: () => void;
   collapsed: boolean;
 }) {
-  const { decodedIdToken } = tokens;
   const initials = decodedIdToken.name?.charAt(0)?.toUpperCase() ?? "?";
 
   return (
@@ -182,7 +181,7 @@ export function Sidebar({
       {/* User */}
       {oidc.isUserLoggedIn ? (
         <UserSection
-          tokens={oidc.oidcTokens}
+          decodedIdToken={oidc.decodedIdToken}
           onLogout={() => oidc.logout({ redirectTo: "home" })}
           collapsed={collapsed}
         />

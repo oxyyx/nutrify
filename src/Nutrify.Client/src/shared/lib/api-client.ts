@@ -8,7 +8,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
     return {};
   }
   return {
-    Authorization: `Bearer ${oidc.getTokens().accessToken}`,
+    Authorization: `Bearer ${await oidc.getAccessToken()}`,
   };
 }
 

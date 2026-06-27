@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { oidcSpa } from "oidc-spa/vite-plugin";
 import path from "path";
 
 const apiUrl =
@@ -10,7 +11,7 @@ const apiUrl =
   "https://localhost:5001";
 
 export default defineConfig({
-  plugins: [TanStackRouterVite({ quoteStyle: "double" }), react(), tailwindcss()],
+  plugins: [oidcSpa(), TanStackRouterVite({ quoteStyle: "double" }), react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

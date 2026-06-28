@@ -1,4 +1,5 @@
 import { oidcSpa } from "oidc-spa/react-spa";
+import { getConfig } from "./config";
 
 export const { bootstrapOidc, useOidc, getOidc, OidcInitializationGate } = oidcSpa
   .withExpectedDecodedIdTokenShape({
@@ -16,9 +17,16 @@ export const { bootstrapOidc, useOidc, getOidc, OidcInitializationGate } = oidcS
   })
   .createUtils();
 
-bootstrapOidc({
-  implementation: "real",
-  issuerUri: import.meta.env.VITE_OIDC_ISSUER || "http://localhost:8080/realms/nutrify",
-  clientId: import.meta.env.VITE_OIDC_CLIENT_ID || "nutrify-spa",
-  BASE_URL: import.meta.env.BASE_URL,
-});
+/**
+ * Boots OIDC using runtime configuration. Must be called after `loadConfig()`
+ * and before the app renders.
+ */
+export function initOidc() {
+  const { oidcIssuer, oidcClientId } = getConfig();
+  bootstrapOidc({
+    implementation: "real",
+    issuerUri: oidcIssuer,
+    clientId: oidcClientId,
+    BASE_URL: import.meta.env.BASE_URL,
+  });
+}

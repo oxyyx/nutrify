@@ -44,16 +44,21 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Auto-migrate database in development
-if (app.Environment.IsDevelopment())
+// Apply any pending EF Core migrations on startup so a freshly deployed
+// container reaches a usable schema without a separate migration step.
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<NutrifyDbContext>();
     await db.Database.MigrateAsync();
 }
 
 // Middleware pipeline
 app.UseExceptionHandler();
+
+// Serve the bundled SPA static assets (wwwroot, populated at container build time)
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -63,6 +68,11 @@ app.MapCategoryEndpoints();
 app.MapFoodItemEndpoints();
 app.MapIntakeEndpoints();
 app.MapDashboardEndpoints();
+app.MapConfigEndpoints();
 app.MapDefaultEndpoints();
+
+// SPA fallback: any non-/api, non-file request returns index.html so the
+// client-side router can handle it.
+app.MapFallbackToFile("index.html");
 
 await app.RunAsync();

@@ -31,4 +31,4 @@ steps:
         - ${CI_COMMIT_SHA}
       username: ${CI_REPO_OWNER}
       password:
-        from_secret: codeberg_token
+        from_secret: codeberg-woodpecker

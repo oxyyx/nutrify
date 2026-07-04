@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.SDK/1.0.5984942">
+  <!--
+    This is the React/Vite client. It is a plain npm app: built and served via
+    the repository Dockerfile and launched in development by the Aspire AppHost
+    (see AddViteApp in ../Nutrify.AppHost/Program.cs).
+
+    This project file exists ONLY so the client shows up and is browsable in the
+    IDE solution view (Rider/Visual Studio). The properties below make sure that
+    `dotnet build`/`dotnet test` on the solution does NOT invoke npm, so CI and
+    the container build are unaffected.
+  -->
+  <PropertyGroup>
+    <StartupCommand>npm run dev</StartupCommand>
+    <BuildCommand>npm run build</BuildCommand>
+    <JavaScriptTestRoot>src\</JavaScriptTestRoot>
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
+  </PropertyGroup>
+</Project>

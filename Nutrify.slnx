@@ -1,7 +1,11 @@
 <Solution>
+  <Folder Name="/SolutionFiles/">
+    <File Path=".github/workflows/publish-image.yaml" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Nutrify.Api/Nutrify.Api.csproj" />
     <Project Path="src/Nutrify.AppHost/Nutrify.AppHost.csproj" />
+    <Project Path="src/Nutrify.Client/Nutrify.Client.esproj" />
     <Project Path="src/Nutrify.Contracts/Nutrify.Contracts.csproj" />
     <Project Path="src/Nutrify.ServiceDefaults/Nutrify.ServiceDefaults.csproj" />
   </Folder>

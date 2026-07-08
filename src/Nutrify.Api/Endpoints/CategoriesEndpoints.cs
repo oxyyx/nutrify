@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Nutrify.Api.Auth;
 using Nutrify.Api.Services;
 using Nutrify.Contracts.Categories;
 
@@ -14,35 +15,35 @@ public static class CategoriesEndpoints
 
         group.MapGet("/", async (string? search, ICategoryService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var categories = await service.GetAllAsync(userId, search);
             return Results.Ok(categories);
         });
 
         group.MapGet("/{id:int}", async (int id, ICategoryService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var category = await service.GetByIdAsync(id, userId);
             return category is not null ? Results.Ok(category) : Results.NotFound();
         });
 
         group.MapPost("/", async (CreateCategoryRequest request, ICategoryService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var category = await service.CreateAsync(userId, request);
             return Results.Created($"/api/categories/{category.Id}", category);
         });
 
         group.MapPut("/{id:int}", async (int id, UpdateCategoryRequest request, ICategoryService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var category = await service.UpdateAsync(id, userId, request);
             return category is not null ? Results.Ok(category) : Results.NotFound();
         });
 
         group.MapDelete("/{id:int}", async (int id, ICategoryService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var deleted = await service.DeleteAsync(id, userId);
             return deleted ? Results.NoContent() : Results.NotFound();
         });

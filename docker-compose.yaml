@@ -1,0 +1,58 @@
+services:
+  app:
+    image: ghcr.io/oxyyx/nutrify:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+
+      # Database (connection string name "nutrify" — see AddNpgsqlDbContext in Program.cs)
+      ConnectionStrings__nutrify: "Host=postgres;Port=5432;Database=nutrify;Username=nutrify;Password=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}"
+
+      # Cache (connection string name "redis" — required at startup by AddRedisDistributedCache)
+      ConnectionStrings__redis: "redis:6379"
+
+      # Keycloak (external). The SPA's OIDC issuer is derived from these as
+      # https://auth.oxy.sh/realms/nutrify unless overridden by Spa__OidcIssuer.
+      Keycloak__auth-server-url: "https://auth.oxy.sh"
+      Keycloak__realm: "nutrify"
+      Keycloak__resource: "nutrify-api"
+      Keycloak__ssl-required: "external"
+      Keycloak__verify-token-audience: "false"
+
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nutrify
+      POSTGRES_USER: nutrify
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nutrify -d nutrify"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
+  redis-data:

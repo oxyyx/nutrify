@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Nutrify.Api.Auth;
 using Nutrify.Api.Services;
 using Nutrify.Contracts.Common;
 using Nutrify.Contracts.FoodItems;
@@ -22,7 +23,7 @@ public static class FoodItemsEndpoints
             IFoodItemService service,
             ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var pagination = new PaginationRequest(page ?? 1, pageSize ?? 20);
             var result = await service.GetAllAsync(userId, pagination, search, categoryId, type);
             return Results.Ok(result);
@@ -30,28 +31,28 @@ public static class FoodItemsEndpoints
 
         group.MapGet("/{id:int}", async (int id, IFoodItemService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var foodItem = await service.GetByIdAsync(id, userId);
             return foodItem is not null ? Results.Ok(foodItem) : Results.NotFound();
         });
 
         group.MapPost("/", async (CreateFoodItemRequest request, IFoodItemService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var foodItem = await service.CreateAsync(userId, request);
             return Results.Created($"/api/food-items/{foodItem.Id}", foodItem);
         });
 
         group.MapPut("/{id:int}", async (int id, UpdateFoodItemRequest request, IFoodItemService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var foodItem = await service.UpdateAsync(id, userId, request);
             return foodItem is not null ? Results.Ok(foodItem) : Results.NotFound();
         });
 
         group.MapDelete("/{id:int}", async (int id, IFoodItemService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var deleted = await service.DeleteAsync(id, userId);
             return deleted ? Results.NoContent() : Results.NotFound();
         });

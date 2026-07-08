@@ -66,6 +66,8 @@ public class FoodItemService(NutrifyDbContext db) : IFoodItemService
 
     public async Task<FoodItemDto> CreateAsync(string userId, CreateFoodItemRequest request)
     {
+        await EnsureCategoryOwnedAsync(request.CategoryId, userId);
+
         var foodItem = new FoodItem
         {
             Name = request.Name,
@@ -97,6 +99,8 @@ public class FoodItemService(NutrifyDbContext db) : IFoodItemService
 
         if (foodItem is null)
             return null;
+
+        await EnsureCategoryOwnedAsync(request.CategoryId, userId);
 
         foodItem.Name = request.Name;
         foodItem.Type = request.Type;
@@ -136,5 +140,17 @@ public class FoodItemService(NutrifyDbContext db) : IFoodItemService
         await db.SaveChangesAsync();
 
         return true;
+    }
+
+    // Categories are per-user; reject references to ids owned by other users
+    // with the same "not found" used for genuinely missing ids.
+    private async Task EnsureCategoryOwnedAsync(int? categoryId, string userId)
+    {
+        if (categoryId is null)
+            return;
+
+        var owned = await db.Categories.AnyAsync(c => c.Id == categoryId && c.UserId == userId);
+        if (!owned)
+            throw new KeyNotFoundException($"Category with id {categoryId} not found.");
     }
 }

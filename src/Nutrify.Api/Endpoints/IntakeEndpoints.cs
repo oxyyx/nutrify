@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Nutrify.Api.Auth;
 using Nutrify.Api.Services;
 using Nutrify.Contracts.Common;
 using Nutrify.Contracts.Intake;
@@ -22,7 +23,7 @@ public static class IntakeEndpoints
             IIntakeService service,
             ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var pagination = new PaginationRequest(page ?? 1, pageSize ?? 20);
             var result = await service.GetEntriesAsync(userId, pagination, date, from, to);
             return Results.Ok(result);
@@ -30,28 +31,28 @@ public static class IntakeEndpoints
 
         group.MapGet("/{id:int}", async (int id, IIntakeService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var entry = await service.GetByIdAsync(id, userId);
             return entry is not null ? Results.Ok(entry) : Results.NotFound();
         });
 
         group.MapPost("/", async (CreateIntakeEntryRequest request, IIntakeService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var entry = await service.CreateAsync(userId, request);
             return Results.Created($"/api/intake/{entry.Id}", entry);
         });
 
         group.MapPut("/{id:int}", async (int id, UpdateIntakeEntryRequest request, IIntakeService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var entry = await service.UpdateAsync(id, userId, request);
             return entry is not null ? Results.Ok(entry) : Results.NotFound();
         });
 
         group.MapDelete("/{id:int}", async (int id, IIntakeService service, ClaimsPrincipal user) =>
         {
-            var userId = user.FindFirstValue("preferred_username")!;
+            var userId = user.GetUserId();
             var deleted = await service.DeleteAsync(id, userId);
             return deleted ? Results.NoContent() : Results.NotFound();
         });

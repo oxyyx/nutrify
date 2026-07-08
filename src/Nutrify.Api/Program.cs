@@ -31,16 +31,8 @@ builder.Services.AddScoped<IFoodItemService, FoodItemService>();
 builder.Services.AddScoped<IIntakeService, IntakeService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 
-// CORS
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+// No CORS policy: the SPA is served from this same origin in production, and
+// the Vite dev server proxies /api, so browser requests are always same-origin.
 
 var app = builder.Build();
 
@@ -59,7 +51,6 @@ app.UseExceptionHandler();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 

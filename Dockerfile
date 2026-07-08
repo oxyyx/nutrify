@@ -58,6 +58,10 @@ RUN apt-get update \
 
 COPY --from=api-build /app/publish ./
 
+# Drop root: the base image ships a non-root "app" user, and 8080 needs no
+# privileges.
+USER app
+
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080

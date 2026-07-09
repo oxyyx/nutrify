@@ -30,6 +30,7 @@
         "*"
       ],
       "defaultClientScopes": [
+        "basic",
         "openid",
         "profile",
         "email"

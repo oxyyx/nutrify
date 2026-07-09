@@ -3,6 +3,7 @@ import type {
   FoodItemDto,
   CreateFoodItemRequest,
   UpdateFoodItemRequest,
+  BarcodeLookupResponse,
   PagedResponse,
   FoodItemType,
 } from "@/shared/lib/types";
@@ -29,6 +30,11 @@ export function fetchFoodItems(params: FoodItemsParams = {}): Promise<PagedRespo
 
 export function fetchFoodItem(id: number): Promise<FoodItemDto> {
   return apiClient.get(`/food-items/${id}`);
+}
+
+/** Throws ApiError with status 404 when the barcode is unknown both internally and externally. */
+export function lookupBarcode(barcode: string): Promise<BarcodeLookupResponse> {
+  return apiClient.get(`/food-items/barcode/${encodeURIComponent(barcode)}`);
 }
 
 export function createFoodItem(data: CreateFoodItemRequest): Promise<FoodItemDto> {

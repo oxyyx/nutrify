@@ -29,6 +29,18 @@ public static class FoodItemsEndpoints
             return Results.Ok(result);
         });
 
+        // Looks up a barcode: the user's own items first, then Open Food Facts.
+        group.MapGet("/barcode/{barcode}", async (
+            string barcode,
+            IFoodItemService service,
+            ClaimsPrincipal user,
+            CancellationToken cancellationToken) =>
+        {
+            var userId = user.GetUserId();
+            var result = await service.LookupByBarcodeAsync(barcode, userId, cancellationToken);
+            return result is not null ? Results.Ok(result) : Results.NotFound();
+        });
+
         group.MapGet("/{id:int}", async (int id, IFoodItemService service, ClaimsPrincipal user) =>
         {
             var userId = user.GetUserId();

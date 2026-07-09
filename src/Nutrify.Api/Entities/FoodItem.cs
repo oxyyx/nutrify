@@ -8,6 +8,7 @@ public class FoodItem
     public required string Name { get; set; }
     public FoodItemType Type { get; set; }
     public string Unit { get; set; } = "g";
+    public string? Barcode { get; set; }
     public required string UserId { get; set; }
 
     // Nutritional values per 100g or 100mL

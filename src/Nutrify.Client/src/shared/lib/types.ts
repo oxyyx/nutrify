@@ -38,6 +38,7 @@ export interface FoodItemDto {
   name: string;
   type: FoodItemType;
   unit: string;
+  barcode: string | null;
   caloriesKcal: number;
   proteinG: number;
   carbohydratesG: number;
@@ -57,6 +58,7 @@ export interface CreateFoodItemRequest {
   fatG: number;
   fiberG: number;
   categoryId: number | null;
+  barcode: string | null;
 }
 
 export interface UpdateFoodItemRequest {
@@ -68,6 +70,32 @@ export interface UpdateFoodItemRequest {
   fatG: number;
   fiberG: number;
   categoryId: number | null;
+  barcode: string | null;
+}
+
+// --- Barcode lookup ---
+
+export enum BarcodeLookupSource {
+  Internal = 0,
+  External = 1,
+}
+
+export interface ExternalProductDto {
+  barcode: string;
+  name: string | null;
+  brand: string | null;
+  suggestedType: FoodItemType;
+  caloriesKcal: number | null;
+  proteinG: number | null;
+  carbohydratesG: number | null;
+  fatG: number | null;
+  fiberG: number | null;
+}
+
+export interface BarcodeLookupResponse {
+  source: BarcodeLookupSource;
+  existingItem: FoodItemDto | null;
+  externalProduct: ExternalProductDto | null;
 }
 
 // --- Intake ---

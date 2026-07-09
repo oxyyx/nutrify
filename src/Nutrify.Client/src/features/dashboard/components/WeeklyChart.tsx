@@ -8,7 +8,7 @@ export function WeeklyChart({ days }: WeeklyChartProps) {
   const maxCalories = Math.max(...days.map((d) => d.summary.totalCalories), 1);
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
       <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Weekly Overview</h2>
       <div className="flex items-end gap-2" style={{ height: "200px" }}>
         {days.map((day) => {

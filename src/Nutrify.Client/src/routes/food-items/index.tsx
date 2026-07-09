@@ -45,36 +45,36 @@ function FoodItemsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Food Items</h1>
-        <div className="flex gap-3">
+        <div className="flex flex-1 justify-end gap-2 sm:flex-none sm:gap-3">
           <Link
             to="/food-items/scan"
-            className="rounded-md bg-gray-100 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+            className="flex-1 rounded-md bg-gray-100 px-4 py-2 text-center text-sm text-gray-700 hover:bg-gray-200 sm:flex-none"
           >
             Scan Barcode
           </Link>
           <Link
             to="/food-items/new"
-            className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary-dark"
+            className="flex-1 rounded-md bg-primary px-4 py-2 text-center text-sm text-white hover:bg-primary-dark sm:flex-none"
           >
             Add Food Item
           </Link>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2 sm:gap-3">
         <input
           type="text"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           placeholder="Search food items..."
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none sm:w-64"
         />
         <select
           value={categoryId ?? ""}
           onChange={(e) => { setCategoryId(e.target.value ? Number(e.target.value) : undefined); setPage(1); }}
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none sm:flex-none"
         >
           <option value="">All categories</option>
           {categories?.map((cat) => (
@@ -84,7 +84,7 @@ function FoodItemsPage() {
         <select
           value={type ?? ""}
           onChange={(e) => { setType(e.target.value !== "" ? Number(e.target.value) as FoodItemType : undefined); setPage(1); }}
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none sm:flex-none"
         >
           <option value="">All types</option>
           <option value="0">Food</option>

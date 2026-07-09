@@ -39,7 +39,7 @@ function DashboardPage() {
       {today && (
         <>
           <TodaySummaryCard summary={today.summary} />
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
             <MacroBreakdown summary={today.summary} />
             {weekly && <WeeklyChart days={weekly.days} />}
           </div>

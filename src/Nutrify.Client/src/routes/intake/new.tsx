@@ -10,7 +10,7 @@ function NewIntakePage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Log Intake</h1>
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
         <IntakeEntryForm
           onSubmit={(data) =>
             mutation.mutate(data, {

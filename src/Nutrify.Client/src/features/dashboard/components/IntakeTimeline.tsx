@@ -8,7 +8,7 @@ interface IntakeTimelineProps {
 export function IntakeTimeline({ entries }: IntakeTimelineProps) {
   if (entries.length === 0) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Today's Intake</h2>
         <p className="text-sm text-gray-500">No entries yet. Start logging your meals!</p>
       </div>
@@ -16,16 +16,16 @@ export function IntakeTimeline({ entries }: IntakeTimelineProps) {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
       <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Today's Intake</h2>
       <div className="space-y-3">
         {entries.map((entry) => (
           <div
             key={entry.id}
-            className="flex items-center justify-between rounded-md border border-gray-100 p-3"
+            className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-md border border-gray-100 p-3"
           >
-            <div>
-              <p className="font-medium text-gray-900">{entry.foodItemName}</p>
+            <div className="min-w-0">
+              <p className="truncate font-medium text-gray-900">{entry.foodItemName}</p>
               <p className="text-sm text-gray-500">
                 {entry.amount}{entry.foodItemUnit} at {formatTime(entry.consumedAt)}
               </p>

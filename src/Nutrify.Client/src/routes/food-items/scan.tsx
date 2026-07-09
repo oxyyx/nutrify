@@ -77,7 +77,7 @@ function ScanBarcodePage() {
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Scan Barcode</h1>
 
-      <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+      <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
         <BarcodeScanner onDetected={handleBarcode} />
 
         <form
@@ -113,7 +113,7 @@ function ScanBarcodePage() {
       </div>
 
       {foundItem && (
-        <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+        <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
           <p className="text-sm text-gray-500">Already in your food items:</p>
           <div>
             <p className="font-medium text-gray-900">{foundItem.name}</p>
@@ -148,7 +148,7 @@ function ScanBarcodePage() {
       )}
 
       {notFoundBarcode && (
-        <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-6 shadow-card">
+        <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
           <p className="text-sm text-gray-600">
             Barcode <span className="font-medium text-gray-900">{notFoundBarcode}</span> wasn't found in
             your food items or Open Food Facts.

@@ -122,18 +122,18 @@ export function FoodItemForm({ initialData, prefill, onSubmit, onCancel, isSubmi
 
       {error && <ErrorBanner message={error} />}
 
-      <div className="flex justify-end gap-3 pt-2">
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-md bg-gray-100 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+          className="rounded-md bg-gray-100 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-200 sm:py-2"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-50"
+          className="rounded-md bg-primary px-4 py-2.5 text-sm text-white hover:bg-primary-dark disabled:opacity-50 sm:py-2"
         >
           {initialData ? "Update" : "Create"} Food Item
         </button>

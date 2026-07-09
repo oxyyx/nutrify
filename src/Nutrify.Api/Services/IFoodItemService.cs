@@ -13,6 +13,7 @@ public interface IFoodItemService
         FoodItemType? type = null);
 
     Task<FoodItemDto?> GetByIdAsync(int id, string userId);
+    Task<BarcodeLookupResponse?> LookupByBarcodeAsync(string barcode, string userId, CancellationToken cancellationToken = default);
     Task<FoodItemDto> CreateAsync(string userId, CreateFoodItemRequest request);
     Task<FoodItemDto?> UpdateAsync(int id, string userId, UpdateFoodItemRequest request);
     Task<bool> DeleteAsync(int id, string userId);

@@ -8,5 +8,6 @@ public record CreateFoodItemRequest(
     decimal CarbohydratesG,
     decimal FatG,
     decimal FiberG,
-    int? CategoryId
+    int? CategoryId,
+    string? Barcode = null
 );

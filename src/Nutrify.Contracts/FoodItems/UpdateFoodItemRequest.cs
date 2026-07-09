@@ -8,5 +8,6 @@ public record UpdateFoodItemRequest(
     decimal CarbohydratesG,
     decimal FatG,
     decimal FiberG,
-    int? CategoryId
+    int? CategoryId,
+    string? Barcode = null
 );

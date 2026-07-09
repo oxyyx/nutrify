@@ -47,12 +47,20 @@ function FoodItemsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Food Items</h1>
-        <Link
-          to="/food-items/new"
-          className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary-dark"
-        >
-          Add Food Item
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            to="/food-items/scan"
+            className="rounded-md bg-gray-100 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+          >
+            Scan Barcode
+          </Link>
+          <Link
+            to="/food-items/new"
+            className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary-dark"
+          >
+            Add Food Item
+          </Link>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3">

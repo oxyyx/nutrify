@@ -7,7 +7,7 @@ using Nutrify.Contracts.FoodItems;
 
 namespace Nutrify.Api.Services;
 
-public class FoodItemService(NutrifyDbContext db) : IFoodItemService
+public class FoodItemService(NutrifyDbContext db, IOpenFoodFactsClient openFoodFacts) : IFoodItemService
 {
     public async Task<PagedResponse<FoodItemDto>> GetAllAsync(
         string userId,
@@ -64,15 +64,39 @@ public class FoodItemService(NutrifyDbContext db) : IFoodItemService
         return foodItem?.ToDto();
     }
 
+    public async Task<BarcodeLookupResponse?> LookupByBarcodeAsync(
+        string barcode,
+        string userId,
+        CancellationToken cancellationToken = default)
+    {
+        var normalized = NormalizeBarcode(barcode);
+        if (normalized is null)
+            throw new ArgumentException("Barcode must be 6 to 32 digits.");
+
+        var existing = await db.FoodItems
+            .Include(f => f.Category)
+            .FirstOrDefaultAsync(f => f.UserId == userId && f.Barcode == normalized, cancellationToken);
+
+        if (existing is not null)
+            return new BarcodeLookupResponse(BarcodeLookupSource.Internal, existing.ToDto(), null);
+
+        var product = await openFoodFacts.GetProductAsync(normalized, cancellationToken);
+        return product is not null
+            ? new BarcodeLookupResponse(BarcodeLookupSource.External, null, product)
+            : null;
+    }
+
     public async Task<FoodItemDto> CreateAsync(string userId, CreateFoodItemRequest request)
     {
         await EnsureCategoryOwnedAsync(request.CategoryId, userId);
+        var barcode = await ValidateBarcodeAsync(request.Barcode, userId);
 
         var foodItem = new FoodItem
         {
             Name = request.Name,
             Type = request.Type,
             Unit = request.Type == FoodItemType.Drink ? "mL" : "g",
+            Barcode = barcode,
             UserId = userId,
             CaloriesKcal = request.CaloriesKcal,
             ProteinG = request.ProteinG,
@@ -101,10 +125,12 @@ public class FoodItemService(NutrifyDbContext db) : IFoodItemService
             return null;
 
         await EnsureCategoryOwnedAsync(request.CategoryId, userId);
+        var barcode = await ValidateBarcodeAsync(request.Barcode, userId, excludeId: id);
 
         foodItem.Name = request.Name;
         foodItem.Type = request.Type;
         foodItem.Unit = request.Type == FoodItemType.Drink ? "mL" : "g";
+        foodItem.Barcode = barcode;
         foodItem.CaloriesKcal = request.CaloriesKcal;
         foodItem.ProteinG = request.ProteinG;
         foodItem.CarbohydratesG = request.CarbohydratesG;
@@ -140,6 +166,34 @@ public class FoodItemService(NutrifyDbContext db) : IFoodItemService
         await db.SaveChangesAsync();
 
         return true;
+    }
+
+    // Barcodes are digits only (EAN-8 through EAN-14 / UPC); returns null for
+    // blank input so an empty form field clears the barcode.
+    private static string? NormalizeBarcode(string? barcode)
+    {
+        var trimmed = barcode?.Trim();
+        if (string.IsNullOrEmpty(trimmed))
+            return null;
+
+        return trimmed.Length is >= 6 and <= 32 && trimmed.All(char.IsAsciiDigit)
+            ? trimmed
+            : throw new ArgumentException("Barcode must be 6 to 32 digits.");
+    }
+
+    private async Task<string?> ValidateBarcodeAsync(string? barcode, string userId, int? excludeId = null)
+    {
+        var normalized = NormalizeBarcode(barcode);
+        if (normalized is null)
+            return null;
+
+        var taken = await db.FoodItems.AnyAsync(f =>
+            f.UserId == userId && f.Barcode == normalized && f.Id != excludeId);
+
+        if (taken)
+            throw new InvalidOperationException("Another food item already uses this barcode.");
+
+        return normalized;
     }
 
     // Categories are per-user; reject references to ids owned by other users

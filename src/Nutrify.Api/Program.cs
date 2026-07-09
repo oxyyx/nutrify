@@ -25,6 +25,15 @@ builder.Services.AddAuthorization();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+// External food database used by barcode lookups. Open Food Facts asks for a
+// descriptive User-Agent identifying the app (https://openfoodfacts.github.io/openfoodfacts-server/api/).
+builder.Services.AddHttpClient<IOpenFoodFactsClient, OpenFoodFactsClient>(client =>
+{
+    client.BaseAddress = new Uri("https://world.openfoodfacts.org/");
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("Nutrify/1.0 (https://nutrify.oxy.sh)");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+
 // Application services
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IFoodItemService, FoodItemService>();

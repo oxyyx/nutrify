@@ -11,8 +11,7 @@ var postgres = builder.AddPostgres("postgres", password: postgresPassword)
 var nutrify = postgres.AddDatabase("nutrify");
 
 // Redis (optional caching)
-var redis = builder.AddRedis("redis")
-    .WithRedisCommander();
+var redis = builder.AddRedis("redis");
 
 // Keycloak identity provider
 var keycloak = builder.AddKeycloakContainer("keycloak", port: 8080)

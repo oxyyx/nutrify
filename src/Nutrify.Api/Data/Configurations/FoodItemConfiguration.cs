@@ -24,6 +24,9 @@ public class FoodItemConfiguration : IEntityTypeConfiguration<FoodItem>
             .HasMaxLength(5)
             .HasDefaultValue("g");
 
+        builder.Property(f => f.Barcode)
+            .HasMaxLength(64);
+
         builder.Property(f => f.CaloriesKcal).HasPrecision(10, 2);
         builder.Property(f => f.ProteinG).HasPrecision(10, 2);
         builder.Property(f => f.CarbohydratesG).HasPrecision(10, 2);
@@ -32,6 +35,10 @@ public class FoodItemConfiguration : IEntityTypeConfiguration<FoodItem>
 
         builder.HasIndex(f => new { f.UserId, f.Name });
         builder.HasIndex(f => f.CategoryId);
+
+        builder.HasIndex(f => new { f.UserId, f.Barcode })
+            .IsUnique()
+            .HasFilter("\"Barcode\" IS NOT NULL");
 
         builder.HasOne(f => f.Category)
             .WithMany(c => c.FoodItems)

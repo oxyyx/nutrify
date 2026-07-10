@@ -25,6 +25,8 @@ public static class MappingExtensions
             foodItem.Type,
             foodItem.Unit,
             foodItem.Barcode,
+            foodItem.ServingSize,
+            foodItem.ServingSizeName,
             foodItem.CaloriesKcal,
             foodItem.ProteinG,
             foodItem.CarbohydratesG,

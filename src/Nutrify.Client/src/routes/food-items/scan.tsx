@@ -53,11 +53,14 @@ function ScanBarcodePage() {
             barcode: p.barcode,
             name: p.name ? (p.brand ? `${p.name} (${p.brand})` : p.name) : undefined,
             type: p.suggestedType === FoodItemType.Drink ? FoodItemType.Drink : undefined,
-            caloriesKcal: p.caloriesKcal ?? undefined,
-            proteinG: p.proteinG ?? undefined,
-            carbohydratesG: p.carbohydratesG ?? undefined,
-            fatG: p.fatG ?? undefined,
-            fiberG: p.fiberG ?? undefined,
+            // Providers often omit some nutriments (fiber especially); default
+            // them to 0 so the user doesn't have to fill every required field.
+            caloriesKcal: p.caloriesKcal ?? 0,
+            proteinG: p.proteinG ?? 0,
+            carbohydratesG: p.carbohydratesG ?? 0,
+            fatG: p.fatG ?? 0,
+            fiberG: p.fiberG ?? 0,
+            servingSize: p.servingSize ?? undefined,
           },
         });
       }

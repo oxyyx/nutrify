@@ -24,6 +24,12 @@ export function FoodItemForm({ initialData, prefill, onSubmit, onCancel, isSubmi
   const [fiberG, setFiberG] = useState(String(initialData?.fiberG ?? prefill?.fiberG ?? ""));
   const [categoryId, setCategoryId] = useState<number | null>(initialData?.categoryId ?? null);
   const [barcode, setBarcode] = useState(initialData?.barcode ?? prefill?.barcode ?? "");
+  const [servingSize, setServingSize] = useState(
+    String(initialData?.servingSize ?? prefill?.servingSize ?? ""),
+  );
+  const [servingSizeName, setServingSizeName] = useState(
+    initialData?.servingSizeName ?? prefill?.servingSizeName ?? "",
+  );
 
   const unit = type === FoodItemType.Drink ? "mL" : "g";
 
@@ -39,6 +45,8 @@ export function FoodItemForm({ initialData, prefill, onSubmit, onCancel, isSubmi
       fiberG: Number(fiberG),
       categoryId,
       barcode: barcode.trim() || null,
+      servingSize: servingSize ? Number(servingSize) : null,
+      servingSizeName: servingSize ? servingSizeName.trim() || null : null,
     });
   }
 
@@ -91,6 +99,37 @@ export function FoodItemForm({ initialData, prefill, onSubmit, onCancel, isSubmi
           placeholder="e.g. 5000112637922"
           className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
         />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Serving size ({unit}) <span className="font-normal text-gray-400">(optional)</span>
+          </label>
+          <input
+            type="number"
+            step="0.1"
+            min="0"
+            value={servingSize}
+            onChange={(e) => setServingSize(e.target.value)}
+            placeholder="e.g. 500"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Serving name <span className="font-normal text-gray-400">(optional)</span>
+          </label>
+          <input
+            type="text"
+            maxLength={50}
+            value={servingSizeName}
+            onChange={(e) => setServingSizeName(e.target.value)}
+            placeholder="e.g. can, slice"
+            disabled={!servingSize}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
+          />
+        </div>
       </div>
 
       <p className="text-sm font-medium text-gray-700">

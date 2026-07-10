@@ -27,6 +27,8 @@ public class OpenFoodFactsClientTests
                 "brands": "Coca-Cola",
                 "quantity": "330 ml",
                 "product_quantity_unit": "ml",
+                "serving_quantity": "330",
+                "product_quantity": 330,
                 "nutriments": {
                   "energy-kcal_100g": 42.1,
                   "proteins_100g": 0,
@@ -49,6 +51,26 @@ public class OpenFoodFactsClientTests
         product.CarbohydratesG.Should().Be(10.6m);
         product.FatG.Should().Be(0m);
         product.FiberG.Should().BeNull();
+        product.ServingSize.Should().Be(330m);
+    }
+
+    [Fact]
+    public async Task GetProductAsync_FallsBackToPackageQuantityForServingSize()
+    {
+        const string json = """
+            {
+              "status": 1,
+              "product": {
+                "product_name": "Energy Drink",
+                "product_quantity": "500",
+                "nutriments": { "energy-kcal_100g": 47 }
+              }
+            }
+            """;
+
+        var product = await CreateClient(HttpStatusCode.OK, json).GetProductAsync("123456789");
+
+        product!.ServingSize.Should().Be(500m);
     }
 
     [Fact]

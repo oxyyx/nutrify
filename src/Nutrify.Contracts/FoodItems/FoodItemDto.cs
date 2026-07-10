@@ -6,6 +6,8 @@ public record FoodItemDto(
     FoodItemType Type,
     string Unit,
     string? Barcode,
+    decimal? ServingSize,
+    string? ServingSizeName,
     decimal CaloriesKcal,
     decimal ProteinG,
     decimal CarbohydratesG,

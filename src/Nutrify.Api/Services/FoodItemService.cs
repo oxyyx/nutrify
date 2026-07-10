@@ -90,6 +90,7 @@ public class FoodItemService(NutrifyDbContext db, IOpenFoodFactsClient openFoodF
     {
         await EnsureCategoryOwnedAsync(request.CategoryId, userId);
         var barcode = await ValidateBarcodeAsync(request.Barcode, userId);
+        var (servingSize, servingSizeName) = NormalizeServing(request.ServingSize, request.ServingSizeName);
 
         var foodItem = new FoodItem
         {
@@ -97,6 +98,8 @@ public class FoodItemService(NutrifyDbContext db, IOpenFoodFactsClient openFoodF
             Type = request.Type,
             Unit = request.Type == FoodItemType.Drink ? "mL" : "g",
             Barcode = barcode,
+            ServingSize = servingSize,
+            ServingSizeName = servingSizeName,
             UserId = userId,
             CaloriesKcal = request.CaloriesKcal,
             ProteinG = request.ProteinG,
@@ -126,11 +129,14 @@ public class FoodItemService(NutrifyDbContext db, IOpenFoodFactsClient openFoodF
 
         await EnsureCategoryOwnedAsync(request.CategoryId, userId);
         var barcode = await ValidateBarcodeAsync(request.Barcode, userId, excludeId: id);
+        var (servingSize, servingSizeName) = NormalizeServing(request.ServingSize, request.ServingSizeName);
 
         foodItem.Name = request.Name;
         foodItem.Type = request.Type;
         foodItem.Unit = request.Type == FoodItemType.Drink ? "mL" : "g";
         foodItem.Barcode = barcode;
+        foodItem.ServingSize = servingSize;
+        foodItem.ServingSizeName = servingSizeName;
         foodItem.CaloriesKcal = request.CaloriesKcal;
         foodItem.ProteinG = request.ProteinG;
         foodItem.CarbohydratesG = request.CarbohydratesG;
@@ -166,6 +172,20 @@ public class FoodItemService(NutrifyDbContext db, IOpenFoodFactsClient openFoodF
         await db.SaveChangesAsync();
 
         return true;
+    }
+
+    // A serving name without a size is meaningless, so it's dropped; the name
+    // is optional and defaults to "serving" in the UI.
+    private static (decimal? Size, string? Name) NormalizeServing(decimal? size, string? name)
+    {
+        if (size is null)
+            return (null, null);
+
+        if (size <= 0)
+            throw new ArgumentException("Serving size must be greater than zero.");
+
+        var trimmedName = name?.Trim();
+        return (size, string.IsNullOrEmpty(trimmedName) ? null : trimmedName);
     }
 
     // Barcodes are digits only (EAN-8 through EAN-14 / UPC); returns null for

@@ -51,6 +51,23 @@ export function IconLogout({ className = "h-3.5 w-3.5 shrink-0" }: IconProps) {
   );
 }
 
+export function IconPlus({ className = "h-4 w-4 shrink-0" }: IconProps) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+      <path strokeLinecap="round" d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+export function IconBarcode({ className = "h-4 w-4 shrink-0" }: IconProps) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+      <path strokeLinecap="round" d="M8 7v10M12 7v10M16 7v10" />
+    </svg>
+  );
+}
+
 export function LogoMark({ className = "shrink-0 text-primary" }: IconProps) {
   return (
     <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth={2.25} viewBox="0 0 24 24" className={className}>

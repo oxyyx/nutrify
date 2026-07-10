@@ -14,6 +14,7 @@ interface NewFoodItemSearch {
   carbohydratesG?: number;
   fatG?: number;
   fiberG?: number;
+  servingSize?: number;
 }
 
 function asNumber(value: unknown): number | undefined {
@@ -42,6 +43,7 @@ function NewFoodItemPage() {
             carbohydratesG: search.carbohydratesG,
             fatG: search.fatG,
             fiberG: search.fiberG,
+            servingSize: search.servingSize,
           }}
           onSubmit={(data) =>
             mutation.mutate(data, {
@@ -67,6 +69,7 @@ export const Route = createFileRoute("/food-items/new")({
     carbohydratesG: asNumber(search.carbohydratesG),
     fatG: asNumber(search.fatG),
     fiberG: asNumber(search.fiberG),
+    servingSize: asNumber(search.servingSize),
   }),
   component: NewFoodItemPage,
 });

@@ -7,6 +7,7 @@ import { ErrorState } from "@/shared/components/ErrorState";
 import { ErrorBanner } from "@/shared/components/ErrorBanner";
 import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
 import { getErrorMessage, getLocalDateString } from "@/shared/lib/utils";
+import { IconPlus } from "@/shared/components/nav";
 
 function IntakePage() {
   const today = getLocalDateString();
@@ -15,13 +16,15 @@ function IntakePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Today's Intake</h1>
         <Link
           to="/intake/new"
-          className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary-dark"
+          aria-label="Add entry"
+          title="Add entry"
+          className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-white hover:bg-primary-dark"
         >
-          Add Entry
+          <IconPlus className="h-5 w-5 shrink-0" />
         </Link>
       </div>
 

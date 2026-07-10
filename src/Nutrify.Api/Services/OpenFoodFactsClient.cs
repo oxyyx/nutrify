@@ -10,7 +10,7 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
 
     public async Task<ExternalProductDto?> GetProductAsync(string barcode, CancellationToken cancellationToken = default)
     {
-        const string fields = "product_name,brands,nutriments,product_quantity_unit,quantity";
+        const string fields = "product_name,brands,nutriments,product_quantity_unit,quantity,serving_quantity,product_quantity";
 
         try
         {
@@ -36,7 +36,8 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
                 GetNutriment(product.Nutriments, "proteins_100g"),
                 GetNutriment(product.Nutriments, "carbohydrates_100g"),
                 GetNutriment(product.Nutriments, "fat_100g"),
-                GetNutriment(product.Nutriments, "fiber_100g")
+                GetNutriment(product.Nutriments, "fiber_100g"),
+                GetServingSize(product)
             );
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
@@ -61,6 +62,14 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
             (quantity.Length == u.Length || !char.IsLetter(quantity[^(u.Length + 1)])));
     }
 
+    // Prefer the declared serving; fall back to the package quantity (a single
+    // can/bottle is usually consumed whole, so it makes a sensible serving).
+    private static decimal? GetServingSize(OffProduct product)
+    {
+        var serving = ParseDecimal(product.ServingQuantity) ?? ParseDecimal(product.ProductQuantity);
+        return serving > 0 ? serving : null;
+    }
+
     private static decimal? GetCaloriesKcal(Dictionary<string, JsonElement>? nutriments)
     {
         var kcal = GetNutriment(nutriments, "energy-kcal_100g");
@@ -78,11 +87,16 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
         if (nutriments is null || !nutriments.TryGetValue(key, out var element))
             return null;
 
-        return element.ValueKind switch
+        return ParseDecimal(element);
+    }
+
+    private static decimal? ParseDecimal(JsonElement? element)
+    {
+        return element?.ValueKind switch
         {
-            JsonValueKind.Number when element.TryGetDecimal(out var value) => value,
+            JsonValueKind.Number when element.Value.TryGetDecimal(out var value) => value,
             JsonValueKind.String when decimal.TryParse(
-                element.GetString(),
+                element.Value.GetString(),
                 System.Globalization.NumberStyles.Number,
                 System.Globalization.CultureInfo.InvariantCulture,
                 out var value) => value,
@@ -100,6 +114,9 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
         [property: JsonPropertyName("brands")] string? Brands,
         [property: JsonPropertyName("product_quantity_unit")] string? ProductQuantityUnit,
         [property: JsonPropertyName("quantity")] string? Quantity,
+        // Number or numeric string depending on the product
+        [property: JsonPropertyName("serving_quantity")] JsonElement? ServingQuantity,
+        [property: JsonPropertyName("product_quantity")] JsonElement? ProductQuantity,
         [property: JsonPropertyName("nutriments")] Dictionary<string, JsonElement>? Nutriments
     );
 }

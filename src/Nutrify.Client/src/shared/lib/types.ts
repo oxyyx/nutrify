@@ -39,6 +39,8 @@ export interface FoodItemDto {
   type: FoodItemType;
   unit: string;
   barcode: string | null;
+  servingSize: number | null;
+  servingSizeName: string | null;
   caloriesKcal: number;
   proteinG: number;
   carbohydratesG: number;
@@ -59,6 +61,8 @@ export interface CreateFoodItemRequest {
   fiberG: number;
   categoryId: number | null;
   barcode: string | null;
+  servingSize: number | null;
+  servingSizeName: string | null;
 }
 
 export interface UpdateFoodItemRequest {
@@ -71,6 +75,8 @@ export interface UpdateFoodItemRequest {
   fiberG: number;
   categoryId: number | null;
   barcode: string | null;
+  servingSize: number | null;
+  servingSizeName: string | null;
 }
 
 // --- Barcode lookup ---
@@ -90,6 +96,7 @@ export interface ExternalProductDto {
   carbohydratesG: number | null;
   fatG: number | null;
   fiberG: number | null;
+  servingSize: number | null;
 }
 
 export interface BarcodeLookupResponse {

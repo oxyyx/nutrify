@@ -11,21 +11,50 @@ interface IntakeEntryFormProps {
   error?: string | null;
 }
 
+/** How the amount field is interpreted: raw g/mL, or number of servings. */
+type AmountMode = "unit" | "serving";
+
 export function IntakeEntryForm({ onSubmit, onCancel, isSubmitting, error }: IntakeEntryFormProps) {
   const [selectedFood, setSelectedFood] = useState<FoodItemDto | null>(null);
   const [amount, setAmount] = useState("");
+  const [mode, setMode] = useState<AmountMode>("unit");
 
-  const preview = selectedFood && amount
-    ? calculateMacros(selectedFood, Number(amount))
-    : null;
+  const servingSize = selectedFood?.servingSize ?? null;
+  const servingName = selectedFood?.servingSizeName ?? "serving";
+
+  // Amount in the item's unit (g/mL), regardless of entry mode.
+  const effectiveAmount =
+    amount === ""
+      ? null
+      : mode === "serving" && servingSize
+        ? Number(amount) * servingSize
+        : Number(amount);
+
+  const preview =
+    selectedFood && effectiveAmount !== null
+      ? calculateMacros(selectedFood, effectiveAmount)
+      : null;
+
+  function handleSelectFood(food: FoodItemDto | null) {
+    setSelectedFood(food);
+    // Items with a serving default to serving entry — that's the quick path
+    // ("1 can"); switching to raw g/mL stays one tap away.
+    if (food?.servingSize) {
+      setMode("serving");
+      setAmount("1");
+    } else {
+      setMode("unit");
+      setAmount("");
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedFood) return;
+    if (!selectedFood || effectiveAmount === null) return;
 
     onSubmit({
       foodItemId: selectedFood.id,
-      amount: Number(amount),
+      amount: effectiveAmount,
     });
   }
 
@@ -35,25 +64,51 @@ export function IntakeEntryForm({ onSubmit, onCancel, isSubmitting, error }: Int
         <label className="mb-1 block text-sm font-medium text-gray-700">Food Item</label>
         <FoodSearchSelect
           selected={selectedFood}
-          onSelect={setSelectedFood}
+          onSelect={handleSelectFood}
         />
       </div>
 
       {selectedFood && (
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Amount ({selectedFood.unit})
-          </label>
-          <input
-            type="number"
-            step="0.1"
-            min="0"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-            placeholder={`Amount in ${selectedFood.unit}`}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-          />
+          <label className="mb-1 block text-sm font-medium text-gray-700">Amount</label>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              step={mode === "serving" ? "0.5" : "0.1"}
+              min="0"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+              placeholder={
+                mode === "serving"
+                  ? `Number of ${servingName}s`
+                  : `Amount in ${selectedFood.unit}`
+              }
+              className="min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+            />
+            {servingSize ? (
+              <select
+                value={mode}
+                onChange={(e) => setMode(e.target.value as AmountMode)}
+                className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+              >
+                <option value="serving">
+                  {servingName} ({servingSize}
+                  {selectedFood.unit})
+                </option>
+                <option value="unit">{selectedFood.unit}</option>
+              </select>
+            ) : (
+              <span className="flex items-center rounded-md bg-gray-50 px-3 text-sm text-gray-500">
+                {selectedFood.unit}
+              </span>
+            )}
+          </div>
+          {mode === "serving" && effectiveAmount !== null && (
+            <p className="mt-1 text-xs text-gray-500">
+              = {Math.round(effectiveAmount * 10) / 10}{selectedFood.unit}
+            </p>
+          )}
         </div>
       )}
 

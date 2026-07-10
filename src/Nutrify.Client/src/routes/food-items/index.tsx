@@ -12,6 +12,7 @@ import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { getErrorMessage } from "@/shared/lib/utils";
 import type { FoodItemType } from "@/shared/lib/types";
+import { IconBarcode, IconPlus } from "@/shared/components/nav";
 
 function FoodItemsPage() {
   const [page, setPage] = useState(1);
@@ -45,20 +46,24 @@ function FoodItemsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Food Items</h1>
-        <div className="flex flex-1 justify-end gap-2 sm:flex-none sm:gap-3">
+        <div className="flex gap-2">
           <Link
             to="/food-items/scan"
-            className="flex-1 rounded-md bg-gray-100 px-4 py-2 text-center text-sm text-gray-700 hover:bg-gray-200 sm:flex-none"
+            aria-label="Scan barcode"
+            title="Scan barcode"
+            className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
           >
-            Scan Barcode
+            <IconBarcode className="h-5 w-5 shrink-0" />
           </Link>
           <Link
             to="/food-items/new"
-            className="flex-1 rounded-md bg-primary px-4 py-2 text-center text-sm text-white hover:bg-primary-dark sm:flex-none"
+            aria-label="Add food item"
+            title="Add food item"
+            className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-white hover:bg-primary-dark"
           >
-            Add Food Item
+            <IconPlus className="h-5 w-5 shrink-0" />
           </Link>
         </div>
       </div>

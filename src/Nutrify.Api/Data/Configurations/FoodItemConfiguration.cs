@@ -27,6 +27,11 @@ public class FoodItemConfiguration : IEntityTypeConfiguration<FoodItem>
         builder.Property(f => f.Barcode)
             .HasMaxLength(64);
 
+        builder.Property(f => f.ServingSize).HasPrecision(10, 2);
+
+        builder.Property(f => f.ServingSizeName)
+            .HasMaxLength(50);
+
         builder.Property(f => f.CaloriesKcal).HasPrecision(10, 2);
         builder.Property(f => f.ProteinG).HasPrecision(10, 2);
         builder.Property(f => f.CarbohydratesG).HasPrecision(10, 2);

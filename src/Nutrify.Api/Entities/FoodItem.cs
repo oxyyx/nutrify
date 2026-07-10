@@ -11,6 +11,11 @@ public class FoodItem
     public string? Barcode { get; set; }
     public required string UserId { get; set; }
 
+    // Optional default serving, e.g. a 500mL can: ServingSize=500, ServingSizeName="can".
+    // ServingSize is in the item's Unit; ServingSizeName is only set when ServingSize is.
+    public decimal? ServingSize { get; set; }
+    public string? ServingSizeName { get; set; }
+
     // Nutritional values per 100g or 100mL
     public decimal CaloriesKcal { get; set; }
     public decimal ProteinG { get; set; }

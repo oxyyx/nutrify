@@ -8,6 +8,7 @@ public class NutrifyDbContext(DbContextOptions<NutrifyDbContext> options) : DbCo
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<FoodItem> FoodItems => Set<FoodItem>();
     public DbSet<IntakeEntry> IntakeEntries => Set<IntakeEntry>();
+    public DbSet<UserSettings> UserSettings => Set<UserSettings>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

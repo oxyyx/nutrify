@@ -39,6 +39,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IFoodItemService, FoodItemService>();
 builder.Services.AddScoped<IIntakeService, IntakeService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 
 // No CORS policy: the SPA is served from this same origin in production, and
 // the Vite dev server proxies /api, so browser requests are always same-origin.
@@ -68,6 +69,7 @@ app.MapCategoryEndpoints();
 app.MapFoodItemEndpoints();
 app.MapIntakeEndpoints();
 app.MapDashboardEndpoints();
+app.MapUserSettingsEndpoints();
 app.MapConfigEndpoints();
 app.MapDefaultEndpoints();
 

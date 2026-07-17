@@ -159,3 +159,22 @@ export interface WeeklyOverviewDto {
   endDate: string;
   days: DailyMacroDto[];
 }
+
+// --- Settings ---
+
+// Daily targets per nutrient; null means no target set for that nutrient.
+export interface NutritionTargetsDto {
+  caloriesKcal: number | null;
+  proteinG: number | null;
+  carbohydratesG: number | null;
+  fatG: number | null;
+  fiberG: number | null;
+}
+
+export interface UserSettingsDto {
+  targets: NutritionTargetsDto;
+}
+
+export interface UpdateUserSettingsRequest {
+  targets: NutritionTargetsDto;
+}

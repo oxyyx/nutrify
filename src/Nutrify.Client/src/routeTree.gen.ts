@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root"
+import { Route as SettingsRouteImport } from "./routes/settings"
 import { Route as DashboardRouteImport } from "./routes/dashboard"
 import { Route as IndexRouteImport } from "./routes/index"
 import { Route as IntakeIndexRouteImport } from "./routes/intake/index"
@@ -20,6 +21,11 @@ import { Route as FoodItemsScanRouteImport } from "./routes/food-items/scan"
 import { Route as FoodItemsNewRouteImport } from "./routes/food-items/new"
 import { Route as FoodItemsFoodItemIdEditRouteImport } from "./routes/food-items/$foodItemId.edit"
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: "/settings",
+  path: "/settings",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: "/dashboard",
   path: "/dashboard",
@@ -74,6 +80,7 @@ const FoodItemsFoodItemIdEditRoute = FoodItemsFoodItemIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
   "/dashboard": typeof DashboardRoute
+  "/settings": typeof SettingsRoute
   "/food-items/new": typeof FoodItemsNewRoute
   "/food-items/scan": typeof FoodItemsScanRoute
   "/intake/history": typeof IntakeHistoryRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
   "/dashboard": typeof DashboardRoute
+  "/settings": typeof SettingsRoute
   "/food-items/new": typeof FoodItemsNewRoute
   "/food-items/scan": typeof FoodItemsScanRoute
   "/intake/history": typeof IntakeHistoryRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
   "/dashboard": typeof DashboardRoute
+  "/settings": typeof SettingsRoute
   "/food-items/new": typeof FoodItemsNewRoute
   "/food-items/scan": typeof FoodItemsScanRoute
   "/intake/history": typeof IntakeHistoryRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
   fullPaths:
     | "/"
     | "/dashboard"
+    | "/settings"
     | "/food-items/new"
     | "/food-items/scan"
     | "/intake/history"
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/dashboard"
+    | "/settings"
     | "/food-items/new"
     | "/food-items/scan"
     | "/intake/history"
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | "__root__"
     | "/"
     | "/dashboard"
+    | "/settings"
     | "/food-items/new"
     | "/food-items/scan"
     | "/intake/history"
@@ -150,6 +162,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  SettingsRoute: typeof SettingsRoute
   FoodItemsNewRoute: typeof FoodItemsNewRoute
   FoodItemsScanRoute: typeof FoodItemsScanRoute
   IntakeHistoryRoute: typeof IntakeHistoryRoute
@@ -162,6 +175,13 @@ export interface RootRouteChildren {
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/settings": {
+      id: "/settings"
+      path: "/settings"
+      fullPath: "/settings"
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/dashboard": {
       id: "/dashboard"
       path: "/dashboard"
@@ -238,6 +258,7 @@ declare module "@tanstack/react-router" {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  SettingsRoute: SettingsRoute,
   FoodItemsNewRoute: FoodItemsNewRoute,
   FoodItemsScanRoute: FoodItemsScanRoute,
   IntakeHistoryRoute: IntakeHistoryRoute,

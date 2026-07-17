@@ -3,6 +3,7 @@ using Nutrify.Contracts.Categories;
 using Nutrify.Contracts.Dashboard;
 using Nutrify.Contracts.FoodItems;
 using Nutrify.Contracts.Intake;
+using Nutrify.Contracts.Settings;
 
 namespace Nutrify.Api.Mapping;
 
@@ -55,6 +56,19 @@ public static class MappingExtensions
             entry.FatG * multiplier,
             entry.FiberG * multiplier,
             entry.ConsumedAt
+        );
+    }
+
+    public static UserSettingsDto ToDto(this UserSettings settings)
+    {
+        return new UserSettingsDto(
+            new NutritionTargetsDto(
+                settings.TargetCaloriesKcal,
+                settings.TargetProteinG,
+                settings.TargetCarbohydratesG,
+                settings.TargetFatG,
+                settings.TargetFiberG
+            )
         );
     }
 

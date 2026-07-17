@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTodayDashboard } from "@/features/dashboard/hooks/useTodayDashboard";
 import { useWeeklyOverview } from "@/features/dashboard/hooks/useWeeklyOverview";
+import { useUserSettings } from "@/features/settings/hooks/useUserSettings";
 import { TodaySummaryCard } from "@/features/dashboard/components/TodaySummaryCard";
 import { MacroBreakdown } from "@/features/dashboard/components/MacroBreakdown";
 import { WeeklyChart } from "@/features/dashboard/components/WeeklyChart";
@@ -12,6 +13,8 @@ import { getErrorMessage } from "@/shared/lib/utils";
 function DashboardPage() {
   const todayQuery = useTodayDashboard();
   const weeklyQuery = useWeeklyOverview();
+  // Targets are supplementary: never block or error the dashboard on them.
+  const { data: settings } = useUserSettings();
   const { data: today } = todayQuery;
   const { data: weekly } = weeklyQuery;
 
@@ -38,7 +41,7 @@ function DashboardPage() {
 
       {today && (
         <>
-          <TodaySummaryCard summary={today.summary} />
+          <TodaySummaryCard summary={today.summary} targets={settings?.targets} />
           <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
             <MacroBreakdown summary={today.summary} />
             {weekly && <WeeklyChart days={weekly.days} />}

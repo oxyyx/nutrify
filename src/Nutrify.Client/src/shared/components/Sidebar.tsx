@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useOidc } from "@/oidc";
 import { getConfig } from "@/config";
-import { IconLogout, LogoMark } from "./nav";
+import { IconLogout, IconSettings, LogoMark } from "./nav";
 import { navItems } from "./nav-items";
 
 // --- User section ---
@@ -30,6 +30,16 @@ function UserSection({
           </div>
         </div>
       )}
+      <Link
+        to="/settings"
+        title={collapsed ? "Settings" : undefined}
+        className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 ${
+          collapsed ? "mx-auto w-8 justify-center" : "w-full"
+        }`}
+      >
+        <IconSettings className="h-3.5 w-3.5 shrink-0" />
+        {!collapsed && "Settings"}
+      </Link>
       <button
         onClick={onLogout}
         title={collapsed ? "Sign out" : undefined}

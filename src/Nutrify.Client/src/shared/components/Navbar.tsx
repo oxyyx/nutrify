@@ -1,6 +1,7 @@
+import { Link } from "@tanstack/react-router";
 import { useOidc } from "@/oidc";
 import { getConfig } from "@/config";
-import { IconLogout, LogoMark } from "./nav";
+import { IconLogout, IconSettings, LogoMark } from "./nav";
 
 export function Navbar() {
   const oidc = useOidc();
@@ -27,8 +28,16 @@ export function Navbar() {
       <p className="hidden text-sm text-gray-400 md:block">{today}</p>
 
       {/* Mobile: date + sign out on the right (the sidebar's user section is hidden) */}
-      <div className="flex items-center gap-3 md:hidden">
-        <span className="text-sm text-gray-400">{todayShort}</span>
+      <div className="flex items-center gap-1.5 md:hidden">
+        <span className="mr-1.5 text-sm text-gray-400">{todayShort}</span>
+        <Link
+          to="/settings"
+          title="Settings"
+          aria-label="Settings"
+          className="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        >
+          <IconSettings className="h-4 w-4 shrink-0" />
+        </Link>
         {oidc.isUserLoggedIn && (
           <button
             onClick={() => oidc.logout({ redirectTo: "home" })}

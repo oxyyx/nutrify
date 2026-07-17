@@ -18,13 +18,14 @@ public class IntakeService(NutrifyDbContext db) : IIntakeService
         string? search = null)
     {
         var query = db.IntakeEntries
-            .Include(e => e.FoodItem)
             .Where(e => e.UserId == userId);
 
         if (!string.IsNullOrWhiteSpace(search))
         {
+            // Filter on the snapshot name so history stays searchable even after
+            // the source food item is renamed or deleted.
             var pattern = search.ToLower();
-            query = query.Where(e => e.FoodItem.Name.ToLower().Contains(pattern));
+            query = query.Where(e => e.FoodItemName.ToLower().Contains(pattern));
         }
 
         if (date.HasValue)
@@ -71,7 +72,6 @@ public class IntakeService(NutrifyDbContext db) : IIntakeService
     public async Task<IntakeEntryDto?> GetByIdAsync(int id, string userId)
     {
         var entry = await db.IntakeEntries
-            .Include(e => e.FoodItem)
             .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
 
         return entry?.ToDto();
@@ -92,13 +92,20 @@ public class IntakeService(NutrifyDbContext db) : IIntakeService
             UserId = userId,
             FoodItemId = request.FoodItemId,
             Amount = request.Amount,
-            ConsumedAt = request.ConsumedAt ?? DateTime.UtcNow
+            ConsumedAt = request.ConsumedAt ?? DateTime.UtcNow,
+            // Snapshot the food item's identity and per-100g/mL nutrition now, so
+            // the entry survives later edits to or deletion of the food item.
+            FoodItemName = foodItem.Name,
+            FoodItemUnit = foodItem.Unit,
+            CaloriesKcal = foodItem.CaloriesKcal,
+            ProteinG = foodItem.ProteinG,
+            CarbohydratesG = foodItem.CarbohydratesG,
+            FatG = foodItem.FatG,
+            FiberG = foodItem.FiberG
         };
 
         db.IntakeEntries.Add(entry);
         await db.SaveChangesAsync();
-
-        await db.Entry(entry).Reference(e => e.FoodItem).LoadAsync();
 
         return entry.ToDto();
     }
@@ -106,7 +113,6 @@ public class IntakeService(NutrifyDbContext db) : IIntakeService
     public async Task<IntakeEntryDto?> UpdateAsync(int id, string userId, UpdateIntakeEntryRequest request)
     {
         var entry = await db.IntakeEntries
-            .Include(e => e.FoodItem)
             .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
 
         if (entry is null)

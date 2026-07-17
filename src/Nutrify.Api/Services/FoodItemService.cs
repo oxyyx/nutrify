@@ -157,18 +157,14 @@ public class FoodItemService(NutrifyDbContext db, IOpenFoodFactsClient openFoodF
     public async Task<bool> DeleteAsync(int id, string userId)
     {
         var foodItem = await db.FoodItems
-            .Include(f => f.IntakeEntries)
             .FirstOrDefaultAsync(f => f.Id == id && f.UserId == userId);
 
         if (foodItem is null)
             return false;
 
-        if (foodItem.IntakeEntries.Count != 0)
-        {
-            throw new InvalidOperationException(
-                "Cannot delete food item that has intake entries. Remove the intake entries first.");
-        }
-
+        // Intake entries carry a nutritional snapshot and an optional FK, so the
+        // database nulls their FoodItemId (OnDelete.SetNull) and the logged
+        // history is preserved rather than blocking the delete.
         db.FoodItems.Remove(foodItem);
         await db.SaveChangesAsync();
 

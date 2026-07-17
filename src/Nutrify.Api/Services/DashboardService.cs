@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Nutrify.Api.Data;
 using Nutrify.Api.Mapping;
 using Nutrify.Contracts.Dashboard;
-using Nutrify.Contracts.Intake;
 
 namespace Nutrify.Api.Services;
 
@@ -15,7 +14,6 @@ public class DashboardService(NutrifyDbContext db) : IDashboardService
         var end = today.AddDays(1).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
 
         var entries = await db.IntakeEntries
-            .Include(e => e.FoodItem)
             .Where(e => e.UserId == userId && e.ConsumedAt >= start && e.ConsumedAt < end)
             .OrderByDescending(e => e.ConsumedAt)
             .ToListAsync();
@@ -34,7 +32,6 @@ public class DashboardService(NutrifyDbContext db) : IDashboardService
         var end = today.AddDays(1).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
 
         var entries = await db.IntakeEntries
-            .Include(e => e.FoodItem)
             .Where(e => e.UserId == userId && e.ConsumedAt >= start && e.ConsumedAt < end)
             .ToListAsync();
 

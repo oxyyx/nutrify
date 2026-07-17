@@ -109,7 +109,7 @@ export interface BarcodeLookupResponse {
 
 export interface IntakeEntryDto {
   id: number;
-  foodItemId: number;
+  foodItemId: number | null;
   foodItemName: string;
   foodItemUnit: string;
   amount: number;

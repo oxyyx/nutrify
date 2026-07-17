@@ -120,7 +120,7 @@ function FoodItemsPage() {
       <ConfirmDialog
         isOpen={deleteId !== null}
         title="Delete Food Item"
-        message="Are you sure you want to delete this food item? This action cannot be undone."
+        message="Are you sure you want to delete this food item? Your logged intake history is kept, but the item won't be available for new entries."
         error={deleteMutation.isError ? getErrorMessage(deleteMutation.error) : null}
         isConfirming={deleteMutation.isPending}
         onConfirm={confirmDelete}

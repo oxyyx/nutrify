@@ -2,7 +2,7 @@ namespace Nutrify.Contracts.Intake;
 
 public record IntakeEntryDto(
     int Id,
-    int FoodItemId,
+    int? FoodItemId,
     string FoodItemName,
     string FoodItemUnit,
     decimal Amount,

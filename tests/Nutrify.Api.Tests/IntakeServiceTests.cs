@@ -3,6 +3,7 @@ using Nutrify.Api.Data;
 using Nutrify.Api.Entities;
 using Nutrify.Api.Services;
 using Nutrify.Contracts.Common;
+using Nutrify.Contracts.Intake;
 
 namespace Nutrify.Api.Tests;
 
@@ -26,9 +27,66 @@ public class IntakeServiceTests
             UserId = userId,
             FoodItem = foodItem,
             Amount = 100,
-            ConsumedAt = consumedAt
+            ConsumedAt = consumedAt,
+            FoodItemName = foodName,
+            FoodItemUnit = "g"
         });
         await db.SaveChangesAsync();
+    }
+
+    [Fact]
+    public async Task CreateAsync_SnapshotsFoodItemNutrition()
+    {
+        await using var db = CreateDb();
+        var service = new IntakeService(db);
+        var foodItem = new FoodItem
+        {
+            Name = "Oatmeal",
+            Unit = "g",
+            UserId = "user1",
+            CaloriesKcal = 380,
+            ProteinG = 13,
+            CarbohydratesG = 60,
+            FatG = 7,
+            FiberG = 10
+        };
+        db.FoodItems.Add(foodItem);
+        await db.SaveChangesAsync();
+
+        var dto = await service.CreateAsync("user1", new CreateIntakeEntryRequest(foodItem.Id, 50, null));
+
+        // DTO reports totals for the logged amount (50g -> half the per-100g values).
+        dto.FoodItemName.Should().Be("Oatmeal");
+        dto.CaloriesKcal.Should().Be(190);
+        dto.ProteinG.Should().Be(6.5m);
+
+        // The entry stores the per-100g snapshot verbatim, independent of amount.
+        var entity = await db.IntakeEntries.SingleAsync();
+        entity.FoodItemName.Should().Be("Oatmeal");
+        entity.FoodItemUnit.Should().Be("g");
+        entity.CaloriesKcal.Should().Be(380);
+        entity.ProteinG.Should().Be(13);
+    }
+
+    [Fact]
+    public async Task CreateAsync_SnapshotSurvivesFoodItemChange()
+    {
+        await using var db = CreateDb();
+        var service = new IntakeService(db);
+        var foodItem = new FoodItem { Name = "Oatmeal", Unit = "g", UserId = "user1", CaloriesKcal = 380 };
+        db.FoodItems.Add(foodItem);
+        await db.SaveChangesAsync();
+
+        await service.CreateAsync("user1", new CreateIntakeEntryRequest(foodItem.Id, 100, null));
+
+        // Mutating the food item after the fact must not rewrite logged history.
+        foodItem.Name = "Renamed Oats";
+        foodItem.CaloriesKcal = 999;
+        await db.SaveChangesAsync();
+
+        var result = await service.GetEntriesAsync("user1", new PaginationRequest(1, 20));
+        result.Items.Should().ContainSingle()
+            .Which.Should().Match<IntakeEntryDto>(e => e.FoodItemName == "Oatmeal" && e.CaloriesKcal == 380);
     }
 
     [Theory]

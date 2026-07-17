@@ -40,18 +40,20 @@ public static class MappingExtensions
 
     public static IntakeEntryDto ToDto(this IntakeEntry entry)
     {
+        // Everything comes from the snapshot on the entry itself, so the mapping
+        // is unaffected by later edits to (or deletion of) the source food item.
         var multiplier = entry.Amount / 100m;
         return new IntakeEntryDto(
             entry.Id,
             entry.FoodItemId,
-            entry.FoodItem.Name,
-            entry.FoodItem.Unit,
+            entry.FoodItemName,
+            entry.FoodItemUnit,
             entry.Amount,
-            entry.FoodItem.CaloriesKcal * multiplier,
-            entry.FoodItem.ProteinG * multiplier,
-            entry.FoodItem.CarbohydratesG * multiplier,
-            entry.FoodItem.FatG * multiplier,
-            entry.FoodItem.FiberG * multiplier,
+            entry.CaloriesKcal * multiplier,
+            entry.ProteinG * multiplier,
+            entry.CarbohydratesG * multiplier,
+            entry.FatG * multiplier,
+            entry.FiberG * multiplier,
             entry.ConsumedAt
         );
     }

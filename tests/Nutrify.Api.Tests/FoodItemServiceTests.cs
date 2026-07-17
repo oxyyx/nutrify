@@ -89,6 +89,36 @@ public class FoodItemServiceTests
         request.ServingSizeName.Should().Be("can");
     }
 
+    [Fact]
+    public async Task DeleteAsync_SucceedsAndPreservesIntakeHistory()
+    {
+        await using var db = CreateDb();
+        var service = CreateService(db);
+        var created = await service.CreateAsync("user1", MonsterRequest());
+
+        db.IntakeEntries.Add(new Entities.IntakeEntry
+        {
+            UserId = "user1",
+            FoodItemId = created.Id,
+            Amount = 500,
+            ConsumedAt = DateTime.UtcNow,
+            FoodItemName = created.Name,
+            FoodItemUnit = created.Unit,
+            CaloriesKcal = created.CaloriesKcal
+        });
+        await db.SaveChangesAsync();
+
+        var deleted = await service.DeleteAsync(created.Id, "user1");
+
+        deleted.Should().BeTrue();
+        (await db.FoodItems.AnyAsync(f => f.Id == created.Id)).Should().BeFalse();
+
+        // The logged entry outlives the food item, keeping its snapshot intact.
+        var entry = await db.IntakeEntries.SingleAsync();
+        entry.FoodItemName.Should().Be("Monster Energy");
+        entry.CaloriesKcal.Should().Be(47);
+    }
+
     private sealed class StubOpenFoodFactsClient : IOpenFoodFactsClient
     {
         public Task<ExternalProductDto?> GetProductAsync(string barcode, CancellationToken cancellationToken = default) =>

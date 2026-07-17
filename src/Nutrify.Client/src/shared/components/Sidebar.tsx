@@ -40,9 +40,6 @@ function UserSection({
         <IconLogout />
         {!collapsed && "Sign out"}
       </button>
-      {!collapsed && (
-        <p className="mt-1 px-2 text-[11px] text-gray-400">{getConfig().version}</p>
-      )}
     </div>
   );
 }
@@ -76,6 +73,7 @@ export function Sidebar({
           <div className="flex items-center gap-2">
             <LogoMark />
             <span className="text-sm font-semibold tracking-tight text-gray-900">Nutrify</span>
+            <span className="text-[11px] font-normal text-gray-400">{getConfig().version}</span>
           </div>
         )}
         <button

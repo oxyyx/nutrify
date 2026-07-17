@@ -1,4 +1,5 @@
 import { useOidc } from "@/oidc";
+import { getConfig } from "@/config";
 import { IconLogout, LogoMark } from "./nav";
 
 export function Navbar() {
@@ -20,6 +21,7 @@ export function Navbar() {
       <div className="flex items-center gap-2 md:hidden">
         <LogoMark />
         <span className="text-sm font-semibold tracking-tight text-gray-900">Nutrify</span>
+        <span className="text-[11px] font-normal text-gray-400">{getConfig().version}</span>
       </div>
 
       <p className="hidden text-sm text-gray-400 md:block">{today}</p>

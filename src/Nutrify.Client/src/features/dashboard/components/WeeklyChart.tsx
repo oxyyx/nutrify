@@ -10,7 +10,7 @@ export function WeeklyChart({ days }: WeeklyChartProps) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
       <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">Weekly Overview</h2>
-      <div className="flex items-end gap-2" style={{ height: "200px" }}>
+      <div className="flex items-end gap-2">
         {days.map((day) => {
           const height = (day.summary.totalCalories / maxCalories) * 100;
           const date = new Date(day.date);
@@ -21,7 +21,9 @@ export function WeeklyChart({ days }: WeeklyChartProps) {
               <span className="text-xs text-gray-500">
                 {Math.round(day.summary.totalCalories)}
               </span>
-              <div className="w-full flex-1 flex items-end">
+              {/* Fixed-height track so the bar's percentage height resolves
+                  against a definite value (a flex-grown parent doesn't). */}
+              <div className="flex h-40 w-full items-end">
                 <div
                   className="w-full rounded-t bg-primary/80"
                   style={{ height: `${Math.max(height, 2)}%` }}

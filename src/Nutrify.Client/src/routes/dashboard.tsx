@@ -3,7 +3,6 @@ import { useTodayDashboard } from "@/features/dashboard/hooks/useTodayDashboard"
 import { useWeeklyOverview } from "@/features/dashboard/hooks/useWeeklyOverview";
 import { useUserSettings } from "@/features/settings/hooks/useUserSettings";
 import { TodaySummaryCard } from "@/features/dashboard/components/TodaySummaryCard";
-import { MacroBreakdown } from "@/features/dashboard/components/MacroBreakdown";
 import { WeeklyChart } from "@/features/dashboard/components/WeeklyChart";
 import { IntakeTimeline } from "@/features/dashboard/components/IntakeTimeline";
 import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
@@ -41,10 +40,15 @@ function DashboardPage() {
 
       {today && (
         <>
-          <TodaySummaryCard summary={today.summary} targets={settings?.targets} />
-          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-            <MacroBreakdown summary={today.summary} />
-            {weekly && <WeeklyChart days={weekly.days} />}
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <TodaySummaryCard summary={today.summary} targets={settings?.targets} />
+            </div>
+            {weekly && (
+              <div className="lg:col-span-1">
+                <WeeklyChart days={weekly.days} />
+              </div>
+            )}
           </div>
           <IntakeTimeline entries={today.entries} />
         </>

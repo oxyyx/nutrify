@@ -31,7 +31,7 @@ function NewFoodItemPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Add Food Item</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Add Food</h1>
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
         <FoodItemForm
           prefill={{

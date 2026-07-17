@@ -117,7 +117,7 @@ function ScanBarcodePage() {
 
       {foundItem && (
         <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
-          <p className="text-sm text-gray-500">Already in your food items:</p>
+          <p className="text-sm text-gray-500">Already in your foods:</p>
           <div>
             <p className="font-medium text-gray-900">{foundItem.name}</p>
             <p className="text-sm text-gray-600">
@@ -154,7 +154,7 @@ function ScanBarcodePage() {
         <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
           <p className="text-sm text-gray-600">
             Barcode <span className="font-medium text-gray-900">{notFoundBarcode}</span> wasn't found in
-            your food items or Open Food Facts.
+            your foods or Open Food Facts.
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
             <Link

@@ -174,7 +174,7 @@ export function FoodItemForm({ initialData, prefill, onSubmit, onCancel, isSubmi
           disabled={isSubmitting}
           className="rounded-md bg-primary px-4 py-2.5 text-sm text-white hover:bg-primary-dark disabled:opacity-50 sm:py-2"
         >
-          {initialData ? "Update" : "Create"} Food Item
+          {initialData ? "Update" : "Create"} Food
         </button>
       </div>
     </form>

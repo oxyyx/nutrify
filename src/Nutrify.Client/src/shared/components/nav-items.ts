@@ -4,6 +4,6 @@ import { IconCategories, IconDashboard, IconFood, IconIntake } from "./nav";
 export const navItems = [
   { to: "/dashboard", label: "Dashboard", shortLabel: "Dashboard", Icon: IconDashboard },
   { to: "/intake", label: "Intake Log", shortLabel: "Intake", Icon: IconIntake },
-  { to: "/food-items", label: "Food Items", shortLabel: "Food", Icon: IconFood },
+  { to: "/food-items", label: "Foods", shortLabel: "Foods", Icon: IconFood },
   { to: "/categories", label: "Categories", shortLabel: "Categories", Icon: IconCategories },
 ] as const;

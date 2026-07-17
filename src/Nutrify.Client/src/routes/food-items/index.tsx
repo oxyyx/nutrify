@@ -47,7 +47,7 @@ function FoodItemsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-gray-900">Food Items</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Foods</h1>
         <div className="flex gap-2">
           <Link
             to="/food-items/scan"
@@ -59,8 +59,8 @@ function FoodItemsPage() {
           </Link>
           <Link
             to="/food-items/new"
-            aria-label="Add food item"
-            title="Add food item"
+            aria-label="Add food"
+            title="Add food"
             className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-white hover:bg-primary-dark"
           >
             <IconPlus className="h-5 w-5 shrink-0" />
@@ -73,7 +73,7 @@ function FoodItemsPage() {
           type="text"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          placeholder="Search food items..."
+          placeholder="Search foods..."
           className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none sm:w-64"
         />
         <select
@@ -101,7 +101,7 @@ function FoodItemsPage() {
         <LoadingSpinner className="py-12" />
       ) : isError ? (
         <ErrorState
-          title="Couldn't load food items"
+          title="Couldn't load foods"
           message={getErrorMessage(error)}
           onRetry={() => refetch()}
         />
@@ -112,15 +112,15 @@ function FoodItemsPage() {
         </>
       ) : (
         <EmptyState
-          title="No food items found"
-          description="Start by adding your first food item."
+          title="No foods found"
+          description="Start by adding your first food."
         />
       )}
 
       <ConfirmDialog
         isOpen={deleteId !== null}
-        title="Delete Food Item"
-        message="Are you sure you want to delete this food item? Your logged intake history is kept, but the item won't be available for new entries."
+        title="Delete Food"
+        message="Are you sure you want to delete this food? Your logged intake history is kept, but it won't be available for new entries."
         error={deleteMutation.isError ? getErrorMessage(deleteMutation.error) : null}
         isConfirming={deleteMutation.isPending}
         onConfirm={confirmDelete}

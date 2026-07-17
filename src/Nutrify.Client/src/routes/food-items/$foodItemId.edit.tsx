@@ -19,7 +19,7 @@ function EditFoodItemPage() {
   if (isError) {
     return (
       <ErrorState
-        title="Couldn't load food item"
+        title="Couldn't load this food"
         message={getErrorMessage(error)}
         onRetry={() => refetch()}
       />
@@ -28,13 +28,13 @@ function EditFoodItemPage() {
 
   if (!foodItem) {
     return (
-      <div className="py-12 text-center text-gray-500">Food item not found.</div>
+      <div className="py-12 text-center text-gray-500">Food not found.</div>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Edit Food Item</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Edit Food</h1>
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-card sm:p-6">
         <FoodItemForm
           initialData={foodItem}

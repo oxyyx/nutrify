@@ -61,7 +61,7 @@ export function IntakeEntryForm({ onSubmit, onCancel, isSubmitting, error }: Int
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Food Item</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">Food</label>
         <FoodSearchSelect
           selected={selectedFood}
           onSelect={handleSelectFood}

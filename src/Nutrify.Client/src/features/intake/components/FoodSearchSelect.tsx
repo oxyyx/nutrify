@@ -46,7 +46,7 @@ export function FoodSearchSelect({ selected, onSelect }: FoodSearchSelectProps) 
           setIsOpen(true);
         }}
         onFocus={() => setIsOpen(true)}
-        placeholder="Search food items..."
+        placeholder="Search foods..."
         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
       />
       {isOpen && data && data.items.length > 0 && (

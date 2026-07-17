@@ -81,13 +81,15 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
         return kj is null ? null : Math.Round(kj.Value / 4.184m, 2);
     }
 
-    // Nutriment values are usually numbers but occasionally numeric strings.
+    // Nutriment values are usually numbers but occasionally numeric strings,
+    // and OFF reports some with far more precision than is meaningful here.
     private static decimal? GetNutriment(Dictionary<string, JsonElement>? nutriments, string key)
     {
         if (nutriments is null || !nutriments.TryGetValue(key, out var element))
             return null;
 
-        return ParseDecimal(element);
+        var value = ParseDecimal(element);
+        return value is null ? null : Math.Round(value.Value, 2);
     }
 
     private static decimal? ParseDecimal(JsonElement? element)

@@ -113,6 +113,34 @@ public class OpenFoodFactsClientTests
     }
 
     [Fact]
+    public async Task GetProductAsync_RoundsNutrimentsToTwoDecimalPlaces()
+    {
+        const string json = """
+            {
+              "status": 1,
+              "product": {
+                "product_name": "Precise Snack",
+                "nutriments": {
+                  "energy-kcal_100g": 42.567,
+                  "proteins_100g": 1.006,
+                  "carbohydrates_100g": 10.601,
+                  "fat_100g": 0.1249,
+                  "fiber_100g": 2.5
+                }
+              }
+            }
+            """;
+
+        var product = await CreateClient(HttpStatusCode.OK, json).GetProductAsync("123456789");
+
+        product!.CaloriesKcal.Should().Be(42.57m);
+        product.ProteinG.Should().Be(1.01m);
+        product.CarbohydratesG.Should().Be(10.6m);
+        product.FatG.Should().Be(0.12m);
+        product.FiberG.Should().Be(2.5m);
+    }
+
+    [Fact]
     public async Task GetProductAsync_ReturnsNullWhenStatusZero()
     {
         const string json = """{ "code": "00000000", "status": 0, "status_verbose": "no code or invalid code" }""";

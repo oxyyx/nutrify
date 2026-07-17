@@ -7,7 +7,7 @@ import { ErrorState } from "@/shared/components/ErrorState";
 import { ErrorBanner } from "@/shared/components/ErrorBanner";
 import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
 import { getErrorMessage, getLocalDateString } from "@/shared/lib/utils";
-import { IconPlus } from "@/shared/components/nav";
+import { IconHistory, IconPlus } from "@/shared/components/nav";
 
 function IntakePage() {
   const today = getLocalDateString();
@@ -18,14 +18,24 @@ function IntakePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Today's Intake</h1>
-        <Link
-          to="/intake/new"
-          aria-label="Add entry"
-          title="Add entry"
-          className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-white hover:bg-primary-dark"
-        >
-          <IconPlus className="h-5 w-5 shrink-0" />
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            to="/intake/history"
+            aria-label="Intake history"
+            title="Intake history"
+            className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            <IconHistory className="h-5 w-5 shrink-0" />
+          </Link>
+          <Link
+            to="/intake/new"
+            aria-label="Add entry"
+            title="Add entry"
+            className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-white hover:bg-primary-dark"
+          >
+            <IconPlus className="h-5 w-5 shrink-0" />
+          </Link>
+        </div>
       </div>
 
       {deleteMutation.isError && (

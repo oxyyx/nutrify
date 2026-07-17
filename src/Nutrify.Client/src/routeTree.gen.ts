@@ -15,6 +15,7 @@ import { Route as IntakeIndexRouteImport } from "./routes/intake/index"
 import { Route as FoodItemsIndexRouteImport } from "./routes/food-items/index"
 import { Route as CategoriesIndexRouteImport } from "./routes/categories/index"
 import { Route as IntakeNewRouteImport } from "./routes/intake/new"
+import { Route as IntakeHistoryRouteImport } from "./routes/intake/history"
 import { Route as FoodItemsScanRouteImport } from "./routes/food-items/scan"
 import { Route as FoodItemsNewRouteImport } from "./routes/food-items/new"
 import { Route as FoodItemsFoodItemIdEditRouteImport } from "./routes/food-items/$foodItemId.edit"
@@ -49,6 +50,11 @@ const IntakeNewRoute = IntakeNewRouteImport.update({
   path: "/intake/new",
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntakeHistoryRoute = IntakeHistoryRouteImport.update({
+  id: "/intake/history",
+  path: "/intake/history",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FoodItemsScanRoute = FoodItemsScanRouteImport.update({
   id: "/food-items/scan",
   path: "/food-items/scan",
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   "/dashboard": typeof DashboardRoute
   "/food-items/new": typeof FoodItemsNewRoute
   "/food-items/scan": typeof FoodItemsScanRoute
+  "/intake/history": typeof IntakeHistoryRoute
   "/intake/new": typeof IntakeNewRoute
   "/categories/": typeof CategoriesIndexRoute
   "/food-items/": typeof FoodItemsIndexRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   "/dashboard": typeof DashboardRoute
   "/food-items/new": typeof FoodItemsNewRoute
   "/food-items/scan": typeof FoodItemsScanRoute
+  "/intake/history": typeof IntakeHistoryRoute
   "/intake/new": typeof IntakeNewRoute
   "/categories": typeof CategoriesIndexRoute
   "/food-items": typeof FoodItemsIndexRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   "/dashboard": typeof DashboardRoute
   "/food-items/new": typeof FoodItemsNewRoute
   "/food-items/scan": typeof FoodItemsScanRoute
+  "/intake/history": typeof IntakeHistoryRoute
   "/intake/new": typeof IntakeNewRoute
   "/categories/": typeof CategoriesIndexRoute
   "/food-items/": typeof FoodItemsIndexRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/food-items/new"
     | "/food-items/scan"
+    | "/intake/history"
     | "/intake/new"
     | "/categories/"
     | "/food-items/"
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/food-items/new"
     | "/food-items/scan"
+    | "/intake/history"
     | "/intake/new"
     | "/categories"
     | "/food-items"
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/food-items/new"
     | "/food-items/scan"
+    | "/intake/history"
     | "/intake/new"
     | "/categories/"
     | "/food-items/"
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   FoodItemsNewRoute: typeof FoodItemsNewRoute
   FoodItemsScanRoute: typeof FoodItemsScanRoute
+  IntakeHistoryRoute: typeof IntakeHistoryRoute
   IntakeNewRoute: typeof IntakeNewRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   FoodItemsIndexRoute: typeof FoodItemsIndexRoute
@@ -191,6 +204,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IntakeNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/intake/history": {
+      id: "/intake/history"
+      path: "/intake/history"
+      fullPath: "/intake/history"
+      preLoaderRoute: typeof IntakeHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/food-items/scan": {
       id: "/food-items/scan"
       path: "/food-items/scan"
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   FoodItemsNewRoute: FoodItemsNewRoute,
   FoodItemsScanRoute: FoodItemsScanRoute,
+  IntakeHistoryRoute: IntakeHistoryRoute,
   IntakeNewRoute: IntakeNewRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
   FoodItemsIndexRoute: FoodItemsIndexRoute,

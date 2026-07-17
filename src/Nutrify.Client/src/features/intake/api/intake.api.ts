@@ -6,12 +6,13 @@ import type {
   PagedResponse,
 } from "@/shared/lib/types";
 
-interface IntakeParams {
+export interface IntakeParams {
   page?: number;
   pageSize?: number;
   date?: string;
   from?: string;
   to?: string;
+  search?: string;
 }
 
 export function fetchIntakeEntries(params: IntakeParams = {}): Promise<PagedResponse<IntakeEntryDto>> {
@@ -21,6 +22,7 @@ export function fetchIntakeEntries(params: IntakeParams = {}): Promise<PagedResp
   if (params.date) searchParams.set("date", params.date);
   if (params.from) searchParams.set("from", params.from);
   if (params.to) searchParams.set("to", params.to);
+  if (params.search) searchParams.set("search", params.search);
 
   const qs = searchParams.toString();
   return apiClient.get(`/intake${qs ? `?${qs}` : ""}`);

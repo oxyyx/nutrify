@@ -14,11 +14,18 @@ public class IntakeService(NutrifyDbContext db) : IIntakeService
         PaginationRequest pagination,
         DateOnly? date = null,
         DateOnly? from = null,
-        DateOnly? to = null)
+        DateOnly? to = null,
+        string? search = null)
     {
         var query = db.IntakeEntries
             .Include(e => e.FoodItem)
             .Where(e => e.UserId == userId);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var pattern = search.ToLower();
+            query = query.Where(e => e.FoodItem.Name.ToLower().Contains(pattern));
+        }
 
         if (date.HasValue)
         {

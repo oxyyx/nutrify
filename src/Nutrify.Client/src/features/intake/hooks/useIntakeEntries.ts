@@ -1,14 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchIntakeEntries } from "../api/intake.api";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { fetchIntakeEntries, type IntakeParams } from "../api/intake.api";
 
-interface UseIntakeEntriesParams {
-  page?: number;
-  date?: string;
-}
-
-export function useIntakeEntries(params: UseIntakeEntriesParams = {}) {
+export function useIntakeEntries(params: IntakeParams = {}) {
   return useQuery({
     queryKey: ["intake", params],
     queryFn: () => fetchIntakeEntries(params),
+    placeholderData: keepPreviousData,
   });
 }

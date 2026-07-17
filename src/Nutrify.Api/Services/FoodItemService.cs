@@ -22,7 +22,8 @@ public class FoodItemService(NutrifyDbContext db, IOpenFoodFactsClient openFoodF
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            query = query.Where(f => f.Name.Contains(search));
+            var pattern = search.ToLower();
+            query = query.Where(f => f.Name.ToLower().Contains(pattern));
         }
 
         if (categoryId.HasValue)

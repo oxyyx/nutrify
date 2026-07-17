@@ -10,7 +10,8 @@ public interface IIntakeService
         PaginationRequest pagination,
         DateOnly? date = null,
         DateOnly? from = null,
-        DateOnly? to = null);
+        DateOnly? to = null,
+        string? search = null);
 
     Task<IntakeEntryDto?> GetByIdAsync(int id, string userId);
     Task<IntakeEntryDto> CreateAsync(string userId, CreateIntakeEntryRequest request);

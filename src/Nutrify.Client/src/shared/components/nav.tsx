@@ -59,6 +59,15 @@ export function IconPlus({ className = "h-4 w-4 shrink-0" }: IconProps) {
   );
 }
 
+export function IconHistory({ className = "h-4 w-4 shrink-0" }: IconProps) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.5 12a8.5 8.5 0 1 0 2.49-6.01M3.5 3.5V6a.5.5 0 0 0 .5.5h2.5" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5V12l3 2" />
+    </svg>
+  );
+}
+
 export function IconBarcode({ className = "h-4 w-4 shrink-0" }: IconProps) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">

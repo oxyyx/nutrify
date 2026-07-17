@@ -20,12 +20,13 @@ public static class IntakeEndpoints
             DateOnly? date,
             DateOnly? from,
             DateOnly? to,
+            string? search,
             IIntakeService service,
             ClaimsPrincipal user) =>
         {
             var userId = user.GetUserId();
             var pagination = new PaginationRequest(page ?? 1, pageSize ?? 20);
-            var result = await service.GetEntriesAsync(userId, pagination, date, from, to);
+            var result = await service.GetEntriesAsync(userId, pagination, date, from, to, search);
             return Results.Ok(result);
         });
 

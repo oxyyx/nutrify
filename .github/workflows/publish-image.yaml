@@ -16,7 +16,17 @@ jobs:
 
     steps:
       - name: Checkout
+        # Full history + tags so `git describe` can resolve a version.
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Compute version
+        id: version
+        # On a semver tag this is e.g. "v1.2.3"; on main it's the nearest tag
+        # plus commits-since and short sha (e.g. "v1.2.3-4-gabc1234"), falling
+        # back to the short sha when no tag exists yet.
+        run: echo "value=$(git describe --tags --always)" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -49,6 +59,8 @@ jobs:
           file: Dockerfile
           platforms: linux/amd64
           push: true
+          build-args: |
+            APP_VERSION=${{ steps.version.outputs.value }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

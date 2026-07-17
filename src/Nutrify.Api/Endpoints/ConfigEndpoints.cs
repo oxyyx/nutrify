@@ -23,7 +23,10 @@ public static class ConfigEndpoints
 
             var clientId = config["Spa:OidcClientId"] ?? "nutrify-spa";
 
-            return Results.Ok(new SpaConfig(issuer, clientId));
+            // Baked into the image at build time (see Dockerfile APP_VERSION).
+            var version = config["APP_VERSION"] ?? "dev";
+
+            return Results.Ok(new SpaConfig(issuer, clientId, version));
         })
         .AllowAnonymous()
         .WithTags("Config");
@@ -31,5 +34,5 @@ public static class ConfigEndpoints
         return routes;
     }
 
-    private sealed record SpaConfig(string? OidcIssuer, string OidcClientId);
+    private sealed record SpaConfig(string? OidcIssuer, string OidcClientId, string Version);
 }

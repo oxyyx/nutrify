@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useOidc } from "@/oidc";
+import { getConfig } from "@/config";
 import { IconLogout, LogoMark } from "./nav";
 import { navItems } from "./nav-items";
 
@@ -39,6 +40,9 @@ function UserSection({
         <IconLogout />
         {!collapsed && "Sign out"}
       </button>
+      {!collapsed && (
+        <p className="mt-1 px-2 text-[11px] text-gray-400">{getConfig().version}</p>
+      )}
     </div>
   );
 }

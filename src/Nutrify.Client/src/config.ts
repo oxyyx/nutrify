@@ -1,6 +1,7 @@
 export interface RuntimeConfig {
   oidcIssuer: string;
   oidcClientId: string;
+  version: string;
 }
 
 // Build-time defaults. Used for local `vite dev` and as a safety net if the
@@ -9,6 +10,7 @@ const fallback: RuntimeConfig = {
   oidcIssuer:
     import.meta.env.VITE_OIDC_ISSUER || "http://localhost:8080/realms/nutrify",
   oidcClientId: import.meta.env.VITE_OIDC_CLIENT_ID || "nutrify-spa",
+  version: "dev",
 };
 
 let config: RuntimeConfig = fallback;
@@ -26,6 +28,7 @@ export async function loadConfig(): Promise<void> {
       config = {
         oidcIssuer: data.oidcIssuer || fallback.oidcIssuer,
         oidcClientId: data.oidcClientId || fallback.oidcClientId,
+        version: data.version || fallback.version,
       };
     }
   } catch {

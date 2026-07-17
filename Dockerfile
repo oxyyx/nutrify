@@ -62,6 +62,12 @@ COPY --from=api-build /app/publish ./
 # privileges.
 USER app
 
+# App version, surfaced to the SPA via /api/config. Declared here in the final
+# stage so bumping it doesn't invalidate the (expensive) build layers above.
+# Defaults to "dev" for plain `podman build` without --build-arg.
+ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
+
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080

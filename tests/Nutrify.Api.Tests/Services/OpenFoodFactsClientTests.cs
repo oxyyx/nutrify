@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Nutrify.Api.Services;
 using Nutrify.Contracts.FoodItems;
 
-namespace Nutrify.Api.Tests;
+namespace Nutrify.Api.Tests.Services;
 
 public class OpenFoodFactsClientTests
 {
@@ -15,7 +15,7 @@ public class OpenFoodFactsClientTests
         return new OpenFoodFactsClient(httpClient, NullLogger<OpenFoodFactsClient>.Instance);
     }
 
-    [Fact]
+    [Test]
     public async Task GetProductAsync_ParsesFoundProduct()
     {
         const string json = """
@@ -42,19 +42,19 @@ public class OpenFoodFactsClientTests
 
         var product = await CreateClient(HttpStatusCode.OK, json).GetProductAsync("5000112637922");
 
-        product.Should().NotBeNull();
-        product!.Name.Should().Be("Coca-Cola");
-        product.Brand.Should().Be("Coca-Cola");
-        product.SuggestedType.Should().Be(FoodItemType.Drink);
-        product.CaloriesKcal.Should().Be(42.1m);
-        product.ProteinG.Should().Be(0m);
-        product.CarbohydratesG.Should().Be(10.6m);
-        product.FatG.Should().Be(0m);
-        product.FiberG.Should().BeNull();
-        product.ServingSize.Should().Be(330m);
+        await Assert.That(product).IsNotNull();
+        await Assert.That(product!.Name).IsEqualTo("Coca-Cola");
+        await Assert.That(product.Brand).IsEqualTo("Coca-Cola");
+        await Assert.That(product.SuggestedType).IsEqualTo(FoodItemType.Drink);
+        await Assert.That(product.CaloriesKcal).IsEqualTo(42.1m);
+        await Assert.That(product.ProteinG).IsEqualTo(0m);
+        await Assert.That(product.CarbohydratesG).IsEqualTo(10.6m);
+        await Assert.That(product.FatG).IsEqualTo(0m);
+        await Assert.That(product.FiberG).IsNull();
+        await Assert.That(product.ServingSize).IsEqualTo(330m);
     }
 
-    [Fact]
+    [Test]
     public async Task GetProductAsync_FallsBackToPackageQuantityForServingSize()
     {
         const string json = """
@@ -70,10 +70,10 @@ public class OpenFoodFactsClientTests
 
         var product = await CreateClient(HttpStatusCode.OK, json).GetProductAsync("123456789");
 
-        product!.ServingSize.Should().Be(500m);
+        await Assert.That(product!.ServingSize).IsEqualTo(500m);
     }
 
-    [Fact]
+    [Test]
     public async Task GetProductAsync_FallsBackToKilojoules()
     {
         const string json = """
@@ -88,12 +88,12 @@ public class OpenFoodFactsClientTests
 
         var product = await CreateClient(HttpStatusCode.OK, json).GetProductAsync("123456789");
 
-        product.Should().NotBeNull();
-        product!.SuggestedType.Should().Be(FoodItemType.Food);
-        product.CaloriesKcal.Should().Be(Math.Round(1046m / 4.184m, 2));
+        await Assert.That(product).IsNotNull();
+        await Assert.That(product!.SuggestedType).IsEqualTo(FoodItemType.Food);
+        await Assert.That(product.CaloriesKcal).IsEqualTo(Math.Round(1046m / 4.184m, 2));
     }
 
-    [Fact]
+    [Test]
     public async Task GetProductAsync_ParsesStringNutrimentValues()
     {
         const string json = """
@@ -108,11 +108,11 @@ public class OpenFoodFactsClientTests
 
         var product = await CreateClient(HttpStatusCode.OK, json).GetProductAsync("123456789");
 
-        product!.CaloriesKcal.Should().Be(402.5m);
-        product.FatG.Should().Be(33m);
+        await Assert.That(product!.CaloriesKcal).IsEqualTo(402.5m);
+        await Assert.That(product.FatG).IsEqualTo(33m);
     }
 
-    [Fact]
+    [Test]
     public async Task GetProductAsync_RoundsNutrimentsToTwoDecimalPlaces()
     {
         const string json = """
@@ -133,37 +133,54 @@ public class OpenFoodFactsClientTests
 
         var product = await CreateClient(HttpStatusCode.OK, json).GetProductAsync("123456789");
 
-        product!.CaloriesKcal.Should().Be(42.57m);
-        product.ProteinG.Should().Be(1.01m);
-        product.CarbohydratesG.Should().Be(10.6m);
-        product.FatG.Should().Be(0.12m);
-        product.FiberG.Should().Be(2.5m);
+        await Assert.That(product!.CaloriesKcal).IsEqualTo(42.57m);
+        await Assert.That(product.ProteinG).IsEqualTo(1.01m);
+        await Assert.That(product.CarbohydratesG).IsEqualTo(10.6m);
+        await Assert.That(product.FatG).IsEqualTo(0.12m);
+        await Assert.That(product.FiberG).IsEqualTo(2.5m);
     }
 
-    [Fact]
+    [Test]
     public async Task GetProductAsync_ReturnsNullWhenStatusZero()
     {
         const string json = """{ "code": "00000000", "status": 0, "status_verbose": "no code or invalid code" }""";
 
         var product = await CreateClient(HttpStatusCode.OK, json).GetProductAsync("00000000");
 
-        product.Should().BeNull();
+        await Assert.That(product).IsNull();
     }
 
-    [Fact]
+    [Test]
     public async Task GetProductAsync_ReturnsNullOnNotFound()
     {
         var product = await CreateClient(HttpStatusCode.NotFound, "").GetProductAsync("999999999999");
 
-        product.Should().BeNull();
+        await Assert.That(product).IsNull();
     }
 
-    [Fact]
+    [Test]
     public async Task GetProductAsync_ReturnsNullOnServerError()
     {
         var product = await CreateClient(HttpStatusCode.InternalServerError, "oops").GetProductAsync("123456789");
 
-        product.Should().BeNull();
+        await Assert.That(product).IsNull();
+    }
+
+    [Test]
+    public async Task GetProductAsync_ReturnsNullOnMalformedJson()
+    {
+        // A truncated or non-JSON body must degrade to "not found", not throw.
+        var product = await CreateClient(HttpStatusCode.OK, "{ not json").GetProductAsync("123456789");
+
+        await Assert.That(product).IsNull();
+    }
+
+    [Test]
+    public async Task GetProductAsync_ReturnsNullWhenProductObjectIsMissing()
+    {
+        var product = await CreateClient(HttpStatusCode.OK, """{ "status": 1 }""").GetProductAsync("123456789");
+
+        await Assert.That(product).IsNull();
     }
 
     private sealed class StubHttpMessageHandler(HttpStatusCode statusCode, string json) : HttpMessageHandler

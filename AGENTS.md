@@ -37,13 +37,20 @@ the whole app runs from one container/process.
   `npx vite build`) *before* `npm run build`/typecheck, or tsc errors on the
   unknown route. Feature folders under `src/features/*` with `api/`, `components/`,
   `hooks/`.
-- `tests/Nutrify.Api.Tests` — xUnit + FluentAssertions, using the **EF Core
-  InMemory** provider (see testing note below).
+- `tests/Nutrify.Api.Tests` — **TUnit** (`[Test]`, `[Arguments]`, and its own
+  `await Assert.That(...)` assertions), using the **EF Core InMemory** provider
+  (see testing note below). Tests run in parallel, so each one builds its own
+  uniquely-named context via `TestDb.Create()` — never share state between tests.
+  For collection assertions where order is the thing under test, pass
+  `CollectionOrdering.Matching`; plain `IsEquivalentTo` ignores order.
 
 ## Commands
 
 - Build all: `dotnet build Nutrify.slnx`
-- Tests: `dotnet test tests/Nutrify.Api.Tests` (add `-c Release` if the AppHost is running)
+- Tests: `dotnet test --project tests/Nutrify.Api.Tests` (add `-c Release` if the
+  AppHost is running). TUnit runs on Microsoft.Testing.Platform, which `global.json`
+  opts into (`"test": { "runner": "Microsoft.Testing.Platform" }`). That mode
+  requires the `--project`/`--solution` flag — a bare path argument is rejected.
 - Client (from `src/Nutrify.Client`): `npm run build` (tsc + vite), `npm run lint`
 - EF migration (needs a dummy connection string because real config comes from Aspire).
   Migrations apply automatically on API startup.
@@ -80,9 +87,12 @@ the whole app runs from one container/process.
 
 ## Deployment
 
-- CI (`.github/workflows/publish-image.yaml`) builds the single-container image and
-  pushes to GHCR: push to `main` → `latest` + `sha-…`; a git tag `vX.Y.Z` → semver
-  tags (`X.Y.Z`, `X.Y`, `X`) and refreshes `latest`.
+- CI (`.github/workflows/publish-image.yaml`) has two jobs. `test` runs the TUnit
+  suite; `publish-image` declares `needs: test`, so a red suite blocks the image
+  entirely. `publish-image` is also guarded by `if: github.event_name == 'push'`,
+  so pull requests run the tests as a check without publishing anything.
+- The image build pushes to GHCR: push to `main` → `latest` + `sha-…`; a git tag
+  `vX.Y.Z` → semver tags (`X.Y.Z`, `X.Y`, `X`) and refreshes `latest`.
 - App version is computed from `git describe` in CI, passed as the `APP_VERSION`
   Docker build-arg → env var → `/api/config`, and shown next to the logo in the SPA.
   Locally (no build-arg) it reads `dev`.

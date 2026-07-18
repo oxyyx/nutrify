@@ -6,9 +6,39 @@ on:
       - main
     tags:
       - "v*.*.*"
+  # Run the tests as a PR check too. `publish-image` is push-only (see its `if`),
+  # so pull requests are verified without publishing anything.
+  pull_request:
+    branches:
+      - main
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore tests/Nutrify.Api.Tests/Nutrify.Api.Tests.csproj
+
+      - name: Test
+        # TUnit runs on Microsoft.Testing.Platform (opted into via global.json),
+        # which requires the --project flag rather than a bare path.
+        run: dotnet test --project tests/Nutrify.Api.Tests/Nutrify.Api.Tests.csproj --no-restore -c Release
+
   publish-image:
+    # Gate the image on a green test run, and never publish from a pull request.
+    needs: test
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read

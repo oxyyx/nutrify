@@ -51,8 +51,8 @@ function FoodItemsPage() {
         <div className="flex gap-2">
           <Link
             to="/food-items/scan"
-            aria-label="Scan barcode"
-            title="Scan barcode"
+            aria-label="Find food by barcode or description"
+            title="Find food by barcode or description"
             className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
           >
             <IconBarcode className="h-5 w-5 shrink-0" />

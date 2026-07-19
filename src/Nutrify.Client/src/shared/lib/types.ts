@@ -105,6 +105,13 @@ export interface BarcodeLookupResponse {
   externalProduct: ExternalProductDto | null;
 }
 
+// --- Description search ---
+
+export interface ProductSearchResponse {
+  existingItems: FoodItemDto[];
+  externalProducts: ExternalProductDto[];
+}
+
 // --- Intake ---
 
 export interface IntakeEntryDto {

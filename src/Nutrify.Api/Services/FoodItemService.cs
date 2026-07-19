@@ -9,6 +9,12 @@ namespace Nutrify.Api.Services;
 
 public class FoodItemService(NutrifyDbContext db, IOpenFoodFactsClient openFoodFacts) : IFoodItemService
 {
+    // Single-character terms match almost everything and make the external
+    // provider do pointless work.
+    private const int MinSearchTermLength = 2;
+    private const int InternalSearchLimit = 10;
+    private const int ExternalSearchLimit = 20;
+
     public async Task<PagedResponse<FoodItemDto>> GetAllAsync(
         string userId,
         PaginationRequest pagination,
@@ -85,6 +91,40 @@ public class FoodItemService(NutrifyDbContext db, IOpenFoodFactsClient openFoodF
         return product is not null
             ? new BarcodeLookupResponse(BarcodeLookupSource.External, null, product)
             : null;
+    }
+
+    public async Task<ProductSearchResponse> SearchProductsAsync(
+        string query,
+        string userId,
+        CancellationToken cancellationToken = default)
+    {
+        var term = query.Trim();
+        if (term.Length < MinSearchTermLength)
+            throw new ArgumentException($"Search term must be at least {MinSearchTermLength} characters.");
+
+        var pattern = term.ToLower();
+        var existing = await db.FoodItems
+            .Include(f => f.Category)
+            .Where(f => f.UserId == userId && f.Name.ToLower().Contains(pattern))
+            .OrderBy(f => f.Name)
+            .Take(InternalSearchLimit)
+            .ToListAsync(cancellationToken);
+
+        var external = await openFoodFacts.SearchProductsAsync(term, ExternalSearchLimit, cancellationToken);
+
+        // Anything the user already has under that barcode is represented by the
+        // internal hit above; showing it again as an external result invites duplicates.
+        var ownedBarcodes = await db.FoodItems
+            .Where(f => f.UserId == userId && f.Barcode != null)
+            .Select(f => f.Barcode!)
+            .ToListAsync(cancellationToken);
+
+        var owned = ownedBarcodes.ToHashSet(StringComparer.Ordinal);
+
+        return new ProductSearchResponse(
+            existing.Select(f => f.ToDto()).ToList(),
+            external.Where(p => !owned.Contains(p.Barcode)).ToList()
+        );
     }
 
     public async Task<FoodItemDto> CreateAsync(string userId, CreateFoodItemRequest request)

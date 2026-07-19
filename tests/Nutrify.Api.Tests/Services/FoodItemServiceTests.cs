@@ -15,6 +15,10 @@ public class FoodItemServiceTests
         NutrifyDbContext db, ExternalProductDto? externalProduct = null) =>
         new(db, new StubOpenFoodFactsClient(externalProduct));
 
+    private static FoodItemService CreateSearchService(
+        NutrifyDbContext db, params ExternalProductDto[] searchResults) =>
+        new(db, new StubOpenFoodFactsClient(null, searchResults));
+
     private static CreateFoodItemRequest MonsterRequest() => new(
         Name: "Monster Energy",
         Type: FoodItemType.Drink,
@@ -522,6 +526,105 @@ public class FoodItemServiceTests
             .Throws<ArgumentException>();
     }
 
+    // ---- Description search ----------------------------------------------
+
+    [Test]
+    public async Task SearchProductsAsync_ReturnsOwnItemsAndExternalMatches()
+    {
+        await using var db = TestDb.Create();
+        var external = new ExternalProductDto(
+            "1111111111111", "Monster Ultra", "Monster", FoodItemType.Drink, 6, 0, 1, 0, 0, 500);
+        var service = CreateSearchService(db, external);
+        await service.CreateAsync("user1", MonsterRequest());
+
+        var result = await service.SearchProductsAsync("monster", "user1");
+
+        await Assert.That(result.ExistingItems.Select(i => i.Name)).IsEquivalentTo(["Monster Energy"]);
+        await Assert.That(result.ExternalProducts.Select(p => p.Name!)).IsEquivalentTo(["Monster Ultra"]);
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_MatchesOwnItemsCaseInsensitively()
+    {
+        await using var db = TestDb.Create();
+        var service = CreateSearchService(db);
+        await service.CreateAsync("user1", MonsterRequest());
+
+        var result = await service.SearchProductsAsync("ENERGY", "user1");
+
+        await Assert.That(result.ExistingItems.Select(i => i.Name)).IsEquivalentTo(["Monster Energy"]);
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_ExcludesOtherUsersItems()
+    {
+        await using var db = TestDb.Create();
+        var service = CreateSearchService(db);
+        await service.CreateAsync("user2", MonsterRequest());
+
+        var result = await service.SearchProductsAsync("monster", "user1");
+
+        await Assert.That(result.ExistingItems).IsEmpty();
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_DropsExternalProductsTheUserAlreadyOwns()
+    {
+        await using var db = TestDb.Create();
+        // Same barcode as MonsterRequest: it is already represented internally.
+        var duplicate = new ExternalProductDto(
+            "5060337502900", "Monster Energy", "Monster", FoodItemType.Drink, 47, 0, 11, 0, 0, 500);
+        var fresh = new ExternalProductDto(
+            "1111111111111", "Monster Ultra", "Monster", FoodItemType.Drink, 6, 0, 1, 0, 0, 500);
+        var service = CreateSearchService(db, duplicate, fresh);
+        await service.CreateAsync("user1", MonsterRequest());
+
+        var result = await service.SearchProductsAsync("monster", "user1");
+
+        await Assert.That(result.ExternalProducts.Select(p => p.Barcode)).IsEquivalentTo(["1111111111111"]);
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_KeepsExternalProductOwnedOnlyByAnotherUser()
+    {
+        await using var db = TestDb.Create();
+        var duplicate = new ExternalProductDto(
+            "5060337502900", "Monster Energy", "Monster", FoodItemType.Drink, 47, 0, 11, 0, 0, 500);
+        var service = CreateSearchService(db, duplicate);
+        await service.CreateAsync("user2", MonsterRequest());
+
+        var result = await service.SearchProductsAsync("monster", "user1");
+
+        await Assert.That(result.ExternalProducts.Select(p => p.Barcode)).IsEquivalentTo(["5060337502900"]);
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_OrdersOwnItemsByName()
+    {
+        await using var db = TestDb.Create();
+        var service = CreateSearchService(db);
+        await service.CreateAsync("user1", MonsterRequest() with { Name = "Monster Zero", Barcode = null });
+        await service.CreateAsync("user1", MonsterRequest() with { Name = "Monster Absolute", Barcode = null });
+
+        var result = await service.SearchProductsAsync("monster", "user1");
+
+        await Assert.That(result.ExistingItems.Select(i => i.Name))
+            .IsEquivalentTo(["Monster Absolute", "Monster Zero"], CollectionOrdering.Matching);
+    }
+
+    [Test]
+    [Arguments("")]
+    [Arguments(" ")]
+    [Arguments("a")]
+    public async Task SearchProductsAsync_RejectsTooShortTerm(string query)
+    {
+        await using var db = TestDb.Create();
+        var service = CreateSearchService(db);
+
+        await Assert.That(async () => await service.SearchProductsAsync(query, "user1"))
+            .Throws<ArgumentException>();
+    }
+
     // ---- History preservation -------------------------------------------
 
     [Test]
@@ -583,10 +686,16 @@ public class FoodItemServiceTests
         await Assert.That(request.ServingSizeName).IsEqualTo("can");
     }
 
-    private sealed class StubOpenFoodFactsClient(ExternalProductDto? product) : IOpenFoodFactsClient
+    private sealed class StubOpenFoodFactsClient(
+        ExternalProductDto? product,
+        IReadOnlyList<ExternalProductDto>? searchResults = null) : IOpenFoodFactsClient
     {
         public Task<ExternalProductDto?> GetProductAsync(
             string barcode, CancellationToken cancellationToken = default) =>
             Task.FromResult(product);
+
+        public Task<IReadOnlyList<ExternalProductDto>> SearchProductsAsync(
+            string query, int pageSize = 20, CancellationToken cancellationToken = default) =>
+            Task.FromResult(searchResults ?? []);
     }
 }

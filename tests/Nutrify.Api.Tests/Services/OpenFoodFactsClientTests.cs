@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nutrify.Api.Services;
 using Nutrify.Contracts.FoodItems;
+using TUnit.Assertions.Enums;
 
 namespace Nutrify.Api.Tests.Services;
 
@@ -181,6 +182,150 @@ public class OpenFoodFactsClientTests
         var product = await CreateClient(HttpStatusCode.OK, """{ "status": 1 }""").GetProductAsync("123456789");
 
         await Assert.That(product).IsNull();
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_ParsesResults()
+    {
+        const string json = """
+            {
+              "count": 2,
+              "products": [
+                {
+                  "code": "5060337502900",
+                  "product_name": "Monster Energy",
+                  "brands": "Monster",
+                  "quantity": "500 ml",
+                  "product_quantity_unit": "ml",
+                  "serving_quantity": 500,
+                  "nutriments": { "energy-kcal_100g": 47, "carbohydrates_100g": 11 }
+                },
+                {
+                  "code": "7622210449283",
+                  "product_name": "Oreo",
+                  "brands": "Mondelez",
+                  "nutriments": { "energy-kcal_100g": 480, "fat_100g": 20 }
+                }
+              ]
+            }
+            """;
+
+        var results = await CreateClient(HttpStatusCode.OK, json).SearchProductsAsync("snack");
+
+        await Assert.That(results.Select(p => p.Barcode))
+            .IsEquivalentTo(["5060337502900", "7622210449283"], CollectionOrdering.Matching);
+        await Assert.That(results[0].Name).IsEqualTo("Monster Energy");
+        await Assert.That(results[0].SuggestedType).IsEqualTo(FoodItemType.Drink);
+        await Assert.That(results[0].ServingSize).IsEqualTo(500m);
+        await Assert.That(results[1].SuggestedType).IsEqualTo(FoodItemType.Food);
+        await Assert.That(results[1].CaloriesKcal).IsEqualTo(480m);
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_ParsesRealWorldPayloadShape()
+    {
+        // Trimmed from a live cgi/search.pl response: the provider returns extra
+        // fields regardless of ?fields=, and serving_quantity is often null.
+        const string json = """
+            {
+              "count": 2, "page": 1, "page_size": 2,
+              "products": [
+                {
+                  "brands": "Oreo",
+                  "code": "7622300336738",
+                  "nutrition_data": "on",
+                  "nutrition_data_prepared_per": "100g",
+                  "product_name": "OREO ORIGINAL",
+                  "product_quantity": 154,
+                  "product_quantity_unit": "g",
+                  "quantity": "154g",
+                  "serving_quantity": 11,
+                  "nutriments": {
+                    "energy-kcal_100g": 472, "proteins_100g": 5.6,
+                    "carbohydrates_100g": 67, "fat_100g": 19, "fiber_100g": 2.9,
+                    "sodium_modifier": "~", "nova-group_unit": ""
+                  },
+                  "nutriments_estimated": { "alcohol_100g": 0 }
+                },
+                {
+                  "brands": "Oreo, Mondelez",
+                  "code": "6111031005576",
+                  "product_name": "original  oreo",
+                  "product_quantity": 55,
+                  "product_quantity_unit": "g",
+                  "quantity": "55g",
+                  "serving_quantity": null,
+                  "nutriments": { "energy-kcal_100g": 481, "fat_100g": 20 }
+                }
+              ]
+            }
+            """;
+
+        var results = await CreateClient(HttpStatusCode.OK, json).SearchProductsAsync("oreo");
+
+        await Assert.That(results.Count).IsEqualTo(2);
+        await Assert.That(results[0].Name).IsEqualTo("OREO ORIGINAL");
+        await Assert.That(results[0].Brand).IsEqualTo("Oreo");
+        await Assert.That(results[0].SuggestedType).IsEqualTo(FoodItemType.Food);
+        await Assert.That(results[0].CaloriesKcal).IsEqualTo(472m);
+        await Assert.That(results[0].FiberG).IsEqualTo(2.9m);
+        await Assert.That(results[0].ServingSize).IsEqualTo(11m);
+        // Null serving_quantity falls back to the package quantity.
+        await Assert.That(results[1].ServingSize).IsEqualTo(55m);
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_SkipsProductsWithoutCodeOrName()
+    {
+        // OFF returns partial records for products nobody has filled in yet;
+        // without a code or name they can't prefill the new-food form.
+        const string json = """
+            {
+              "products": [
+                { "code": "111111", "product_name": "" },
+                { "product_name": "No Barcode" },
+                { "code": "222222", "product_name": "Usable" }
+              ]
+            }
+            """;
+
+        var results = await CreateClient(HttpStatusCode.OK, json).SearchProductsAsync("thing");
+
+        await Assert.That(results.Select(p => p.Name!)).IsEquivalentTo(["Usable"]);
+    }
+
+    [Test]
+    [Arguments("")]
+    [Arguments("   ")]
+    public async Task SearchProductsAsync_ReturnsEmptyForBlankQueryWithoutCallingProvider(string query)
+    {
+        var results = await CreateClient(HttpStatusCode.InternalServerError, "oops").SearchProductsAsync(query);
+
+        await Assert.That(results).IsEmpty();
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_ReturnsEmptyOnServerError()
+    {
+        var results = await CreateClient(HttpStatusCode.InternalServerError, "oops").SearchProductsAsync("snack");
+
+        await Assert.That(results).IsEmpty();
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_ReturnsEmptyOnMalformedJson()
+    {
+        var results = await CreateClient(HttpStatusCode.OK, "{ not json").SearchProductsAsync("snack");
+
+        await Assert.That(results).IsEmpty();
+    }
+
+    [Test]
+    public async Task SearchProductsAsync_ReturnsEmptyWhenProductsArrayIsMissing()
+    {
+        var results = await CreateClient(HttpStatusCode.OK, """{ "count": 0 }""").SearchProductsAsync("snack");
+
+        await Assert.That(results).IsEmpty();
     }
 
     private sealed class StubHttpMessageHandler(HttpStatusCode statusCode, string json) : HttpMessageHandler

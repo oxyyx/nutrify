@@ -8,14 +8,15 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
 {
     private static readonly string[] DrinkQuantityUnits = ["ml", "cl", "dl", "l"];
 
+    private const string ProductFields =
+        "code,product_name,brands,nutriments,product_quantity_unit,quantity,serving_quantity,product_quantity";
+
     public async Task<ExternalProductDto?> GetProductAsync(string barcode, CancellationToken cancellationToken = default)
     {
-        const string fields = "product_name,brands,nutriments,product_quantity_unit,quantity,serving_quantity,product_quantity";
-
         try
         {
             using var response = await httpClient.GetAsync(
-                $"api/v2/product/{Uri.EscapeDataString(barcode)}?fields={fields}",
+                $"api/v2/product/{Uri.EscapeDataString(barcode)}?fields={ProductFields}",
                 cancellationToken);
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -27,18 +28,7 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
             if (result is not { Status: 1, Product: { } product })
                 return null;
 
-            return new ExternalProductDto(
-                barcode,
-                string.IsNullOrWhiteSpace(product.ProductName) ? null : product.ProductName.Trim(),
-                string.IsNullOrWhiteSpace(product.Brands) ? null : product.Brands.Trim(),
-                IsDrink(product) ? FoodItemType.Drink : FoodItemType.Food,
-                GetCaloriesKcal(product.Nutriments),
-                GetNutriment(product.Nutriments, "proteins_100g"),
-                GetNutriment(product.Nutriments, "carbohydrates_100g"),
-                GetNutriment(product.Nutriments, "fat_100g"),
-                GetNutriment(product.Nutriments, "fiber_100g"),
-                GetServingSize(product)
-            );
+            return MapProduct(product, barcode);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
         {
@@ -48,6 +38,60 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
             return null;
         }
     }
+
+    public async Task<IReadOnlyList<ExternalProductDto>> SearchProductsAsync(
+        string query,
+        int pageSize = 20,
+        CancellationToken cancellationToken = default)
+    {
+        var terms = query.Trim();
+        if (terms.Length == 0)
+            return [];
+
+        var size = Math.Clamp(pageSize, 1, 50);
+
+        try
+        {
+            // The v2 API has no free-text search; cgi/search.pl is the documented
+            // endpoint for it (https://openfoodfacts.github.io/openfoodfacts-server/api/).
+            using var response = await httpClient.GetAsync(
+                $"cgi/search.pl?search_terms={Uri.EscapeDataString(terms)}&search_simple=1&action=process&json=1&page_size={size}&fields={ProductFields}",
+                cancellationToken);
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<OffSearchResponse>(cancellationToken);
+            if (result?.Products is null)
+                return [];
+
+            // A product with no name or no barcode can't prefill the form usefully.
+            return result.Products
+                .Where(p => !string.IsNullOrWhiteSpace(p.Code) && !string.IsNullOrWhiteSpace(p.ProductName))
+                .Select(p => MapProduct(p, p.Code!.Trim()))
+                .ToList();
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            // Best-effort, as with barcode lookup: a provider failure degrades to
+            // "no external matches" rather than failing the whole search.
+            logger.LogWarning(ex, "Open Food Facts search failed for query {Query}", terms);
+            return [];
+        }
+    }
+
+    private static ExternalProductDto MapProduct(OffProduct product, string barcode) =>
+        new(
+            barcode,
+            string.IsNullOrWhiteSpace(product.ProductName) ? null : product.ProductName.Trim(),
+            string.IsNullOrWhiteSpace(product.Brands) ? null : product.Brands.Trim(),
+            IsDrink(product) ? FoodItemType.Drink : FoodItemType.Food,
+            GetCaloriesKcal(product.Nutriments),
+            GetNutriment(product.Nutriments, "proteins_100g"),
+            GetNutriment(product.Nutriments, "carbohydrates_100g"),
+            GetNutriment(product.Nutriments, "fat_100g"),
+            GetNutriment(product.Nutriments, "fiber_100g"),
+            GetServingSize(product)
+        );
 
     private static bool IsDrink(OffProduct product)
     {
@@ -111,7 +155,12 @@ public class OpenFoodFactsClient(HttpClient httpClient, ILogger<OpenFoodFactsCli
         [property: JsonPropertyName("product")] OffProduct? Product
     );
 
+    private sealed record OffSearchResponse(
+        [property: JsonPropertyName("products")] List<OffProduct>? Products
+    );
+
     private sealed record OffProduct(
+        [property: JsonPropertyName("code")] string? Code,
         [property: JsonPropertyName("product_name")] string? ProductName,
         [property: JsonPropertyName("brands")] string? Brands,
         [property: JsonPropertyName("product_quantity_unit")] string? ProductQuantityUnit,
